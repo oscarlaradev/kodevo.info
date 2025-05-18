@@ -16,7 +16,7 @@ export default function FavoritesPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    document.title = 'My Favorite Projects - CodeCanvas';
+    document.title = 'Mis Proyectos Favoritos - Kodevo';
   }, []);
 
   // Fetch all projects once when favorites are mounted
@@ -29,8 +29,8 @@ export default function FavoritesPage() {
           setAllProjects(fetchedProjects);
         })
         .catch(err => {
-          console.error("Error fetching projects for favorites page:", err);
-          setError(err instanceof Error ? err.message : "Could not load project details for favorites.");
+          console.error("Error al obtener proyectos para la página de favoritos:", err);
+          setError(err instanceof Error ? err.message : "No se pudieron cargar los detalles del proyecto para los favoritos.");
         })
         .finally(() => {
           setIsLoading(false);
@@ -52,7 +52,7 @@ export default function FavoritesPage() {
     return (
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
         <Loader2 className="h-16 w-16 text-primary mx-auto mb-4 animate-spin" />
-        <p className="text-lg text-muted-foreground">Loading your favorite projects...</p>
+        <p className="text-lg text-muted-foreground">Cargando tus proyectos favoritos...</p>
       </div>
     ); 
   }
@@ -62,7 +62,7 @@ export default function FavoritesPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
         <div className="text-center py-10 bg-destructive/10 text-destructive p-6 rounded-lg shadow-md">
           <AlertTriangle className="h-12 w-12 mx-auto mb-3" />
-          <h2 className="text-2xl font-semibold mb-2">Error Loading Favorites</h2>
+          <h2 className="text-2xl font-semibold mb-2">Error al Cargar Favoritos</h2>
           <p>{error}</p>
         </div>
       </div>
@@ -74,9 +74,9 @@ export default function FavoritesPage() {
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
       <header className="text-center mb-12 md:mb-16 animate-fade-in-up">
         <HeartPulse className="h-16 w-16 text-primary mx-auto mb-4" />
-        <h1 className="text-4xl md:text-5xl font-extrabold text-foreground">My Favorite Projects</h1>
+        <h1 className="text-4xl md:text-5xl font-extrabold text-foreground">Mis Proyectos Favoritos</h1>
         <p className="text-lg md:text-xl text-muted-foreground mt-4 max-w-2xl mx-auto">
-          Projects you've saved for later. Manage your favorites here or on the project cards.
+          Proyectos que has guardado para más tarde. Gestiona tus favoritos aquí o en las tarjetas de los proyectos.
         </p>
       </header>
       {favoriteProjects.length > 0 ? (
@@ -84,10 +84,10 @@ export default function FavoritesPage() {
       ) : (
         <div className="text-center py-10 bg-card shadow-lg rounded-xl p-8">
           <HeartPulse className="h-20 w-20 text-muted-foreground mx-auto mb-6" />
-          <h2 className="text-2xl font-semibold text-foreground mb-3">No Favorites Yet!</h2>
+          <h2 className="text-2xl font-semibold text-foreground mb-3">¡Aún no hay favoritos!</h2>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Looks like you haven't added any projects to your favorites. 
-            Click the heart icon on any project to save it here for easy access.
+            Parece que no has añadido ningún proyecto a tus favoritos. 
+            Haz clic en el icono del corazón en cualquier proyecto para guardarlo aquí y acceder fácilmente.
           </p>
         </div>
       )}

@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'CodeCanvas - Developer Portfolio',
-  description: 'A minimalist and modern developer portfolio by a senior programmer.',
+  title: 'Kodevo - Portafolio de Desarrollador',
+  description: 'Un portafolio de desarrollador minimalista y moderno.',
 };
 
 export default function RootLayout({
@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       {/* 
         Apply the Inter font's CSS variable class to the body.
         The 'font-sans' Tailwind utility class will then use this CSS variable.

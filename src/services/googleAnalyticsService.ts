@@ -24,11 +24,11 @@ export async function getPageViewReport(): Promise<GaReportOutput> {
   const serviceAccountKeyJson = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON;
 
   if (!propertyId) {
-    console.error('[GA Service] GA4_PROPERTY_ID is not set in environment variables.');
-    return { data: [], startDate: '', endDate: '', error: 'GA4 Property ID no configurado en el servidor.' };
+    console.error('[Servicio GA] GA4_PROPERTY_ID no está configurado en las variables de entorno.');
+    return { data: [], startDate: '', endDate: '', error: 'ID de Propiedad GA4 no configurado en el servidor.' };
   }
   if (!serviceAccountKeyJson) {
-    console.error('[GA Service] GOOGLE_SERVICE_ACCOUNT_KEY_JSON is not set in environment variables.');
+    console.error('[Servicio GA] GOOGLE_SERVICE_ACCOUNT_KEY_JSON no está configurado en las variables de entorno.');
     return { data: [], startDate: '', endDate: '', error: 'Clave de cuenta de servicio de Google no configurada en el servidor.' };
   }
 
@@ -36,7 +36,7 @@ export async function getPageViewReport(): Promise<GaReportOutput> {
   try {
     credentials = JSON.parse(serviceAccountKeyJson);
   } catch (e) {
-    console.error('[GA Service] Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY_JSON:', e);
+    console.error('[Servicio GA] Fallo al parsear GOOGLE_SERVICE_ACCOUNT_KEY_JSON:', e);
     return { data: [], startDate: '', endDate: '', error: 'Error al parsear la clave de cuenta de servicio de Google.' };
   }
 
@@ -45,12 +45,12 @@ export async function getPageViewReport(): Promise<GaReportOutput> {
   });
 
   const today = new Date();
-  const sevenDaysAgo = subDays(today, 7); // Data for the last 7 full days.
+  const sevenDaysAgo = subDays(today, 7); 
   const formattedStartDate = format(sevenDaysAgo, 'yyyy-MM-dd');
-  const formattedEndDate = format(subDays(today,1), 'yyyy-MM-dd'); // GA data is usually available up to 'yesterday'. 'today' might be incomplete.
+  const formattedEndDate = format(subDays(today,1), 'yyyy-MM-dd'); // Data for 'yesterday'
 
   try {
-    console.log(`[GA Service] Fetching report for property ID: ${propertyId} from ${formattedStartDate} to ${formattedEndDate}`);
+    console.log(`[Servicio GA] Obteniendo informe para ID de propiedad: ${propertyId} desde ${formattedStartDate} hasta ${formattedEndDate}`);
     const [response] = await analyticsDataClient.runReport({
       property: `properties/${propertyId}`,
       dateRanges: [
@@ -79,12 +79,12 @@ export async function getPageViewReport(): Promise<GaReportOutput> {
       ]
     });
     
-    console.log('[GA Service] Report response received from GA API.');
+    console.log('[Servicio GA] Respuesta del informe recibida de la API de GA.');
 
     const reportData: GaDataPoint[] = [];
     response.rows?.forEach(row => {
       if (row.dimensionValues && row.metricValues) {
-        const dateString = row.dimensionValues[0].value || 'unknown-date';
+        const dateString = row.dimensionValues[0].value || 'fecha-desconocida';
         // GA date format is YYYYMMDD, convert to YYYY-MM-DD
         const formattedApiDate = `${dateString.substring(0,4)}-${dateString.substring(4,6)}-${dateString.substring(6,8)}`;
         
@@ -95,13 +95,10 @@ export async function getPageViewReport(): Promise<GaReportOutput> {
       }
     });
 
-    // Data from API is already ordered by date due to orderBys
-    // reportData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
     if (response.rows?.length === 0) {
-      console.log('[GA Service] Successfully fetched report from GA API, but it contained 0 rows of data for the specified period.');
+      console.log('[Servicio GA] Informe obtenido exitosamente de la API de GA, pero contenía 0 filas de datos para el período especificado.');
     }
-    console.log(`[GA Service] Processed ${reportData.length} data points.`);
+    console.log(`[Servicio GA] Procesados ${reportData.length} puntos de datos.`);
     return { 
       data: reportData, 
       startDate: formattedStartDate, 
@@ -109,7 +106,7 @@ export async function getPageViewReport(): Promise<GaReportOutput> {
     };
 
   } catch (error) {
-    console.error('[GA Service] Error fetching Google Analytics report:', error);
+    console.error('[Servicio GA] Error al obtener el informe de Google Analytics:', error);
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido al obtener el informe de GA.';
     return { 
       data: [], 

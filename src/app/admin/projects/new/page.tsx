@@ -10,7 +10,7 @@ export default function NewProjectPage() {
   const router = useRouter(); 
 
   const handleFormSuccess = (projectId: string) => {
-    console.log(`Project created successfully with ID: ${projectId} from page level!`);
+    console.log(`Proyecto creado exitosamente con ID: ${projectId} desde el nivel de página.`);
     // Redirect to the projects list page after successful creation
     router.push('/admin/projects'); 
     // You might also want to call router.refresh() if the projects page needs to re-fetch immediately

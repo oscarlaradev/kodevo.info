@@ -1,11 +1,11 @@
 
 'use server';
 /**
- * @fileOverview A Genkit flow to generate related SEO keywords.
+ * @fileOverview Un flujo de Genkit para generar palabras clave SEO relacionadas.
  *
- * - generateRelatedKeywords - A function that generates related keywords based on a main topic/keyword.
- * - RelatedKeywordsInput - The input type for the generateRelatedKeywords function.
- * - RelatedKeywordsOutput - The return type for the generateRelatedKeywords function.
+ * - generateRelatedKeywords - Una función que genera palabras clave relacionadas basada en un tema/palabra clave principal.
+ * - RelatedKeywordsInput - El tipo de entrada para la función generateRelatedKeywords.
+ * - RelatedKeywordsOutput - El tipo de retorno para la función generateRelatedKeywords.
  */
 
 import {ai} from '@/ai/genkit';

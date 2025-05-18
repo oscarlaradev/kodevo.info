@@ -24,7 +24,7 @@ export function HeroSection() {
             />
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-foreground mb-6 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-            Hi, I&apos;m <span className="text-primary">{bioData.name}</span>
+            Hola, soy <span className="text-primary">{bioData.name}</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-4 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
             {bioData.title}
@@ -35,13 +35,12 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 animate-fade-in-up" style={{ animationDelay: '1s' }}>
             <Button size="lg" asChild className="rounded-full shadow-lg hover:shadow-xl transform transition-all hover:scale-105">
               <Link href="/projects">
-                <Briefcase className="mr-2 h-5 w-5" /> View My Work
+                <Briefcase className="mr-2 h-5 w-5" /> Ver Mi Trabajo
               </Link>
             </Button>
             <Button variant="outline" size="lg" asChild className="rounded-full shadow-md hover:shadow-lg transform transition-all hover:scale-105">
-              {/* Updated to OscarLara.pdf */}
               <a href="/OscarLara.pdf" download="OscarLara.pdf">
-                <Download className="mr-2 h-5 w-5" /> Download CV
+                <Download className="mr-2 h-5 w-5" /> Descargar CV
               </a>
             </Button>
           </div>

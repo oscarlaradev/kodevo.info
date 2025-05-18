@@ -34,7 +34,7 @@ export default function EditProjectPage() {
           }
         })
         .catch((err) => {
-          console.error("Error fetching project for edit:", err);
+          console.error("Error al obtener el proyecto para editar:", err);
           setError("No se pudo cargar el proyecto para editar.");
         })
         .finally(() => {
@@ -48,7 +48,7 @@ export default function EditProjectPage() {
   }, [projectId]);
 
   const handleFormSuccess = (updatedProjectId: string) => {
-    console.log(`Project ${updatedProjectId} updated successfully!`);
+    console.log(`Proyecto ${updatedProjectId} actualizado exitosamente.`);
     router.push('/admin/projects');
     router.refresh(); // Important to re-fetch the list on the projects page
   };

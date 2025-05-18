@@ -41,7 +41,7 @@ export default function AdminProjectsPage() {
       fetchedProjects.sort((a, b) => a.title.localeCompare(b.title));
       setProjects(fetchedProjects);
     } catch (err) {
-      console.error("Error fetching projects for admin page:", err);
+      console.error("Error al obtener proyectos para la página de administración:", err);
       const errorMessage = err instanceof Error ? err.message : "No se pudieron cargar los proyectos. Intenta de nuevo más tarde.";
       setError(errorMessage);
       toast({
@@ -73,7 +73,7 @@ export default function AdminProjectsPage() {
       });
       await fetchProjects(); 
     } catch (err) {
-      console.error(`Error deleting project ${projectToDelete.id}:`, err);
+      console.error(`Error al eliminar el proyecto ${projectToDelete.id}:`, err);
       const errorMessage = err instanceof Error ? err.message : "No se pudo eliminar el proyecto.";
       setError(errorMessage); 
       toast({

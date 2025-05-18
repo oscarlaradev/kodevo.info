@@ -1,10 +1,10 @@
 'use server';
 /**
- * @fileOverview A Genkit flow to generate SEO content ideas.
+ * @fileOverview Un flujo de Genkit para generar ideas de contenido SEO.
  *
- * - generateSeoContentIdeas - A function that generates content ideas based on a topic.
- * - SeoContentIdeasInput - The input type for the generateSeoContentIdeas function.
- * - SeoContentIdeasOutput - The return type for the generateSeoContentIdeas function.
+ * - generateSeoContentIdeas - Una función que genera ideas de contenido basadas en un tema.
+ * - SeoContentIdeasInput - El tipo de entrada para la función generateSeoContentIdeas.
+ * - SeoContentIdeasOutput - El tipo de retorno para la función generateSeoContentIdeas.
  */
 
 import {ai} from '@/ai/genkit';

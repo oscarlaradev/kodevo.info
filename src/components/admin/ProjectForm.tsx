@@ -58,8 +58,21 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
   });
 
   useEffect(() => {
-    form.reset(computedDefaultValues);
-  }, [initialData, form.reset]);
+    // Reset form with initialData when it changes, or with computedDefaultValues if no initialData
+    form.reset(initialData ? {
+        title: initialData.title,
+        shortDescription: initialData.shortDescription,
+        longDescription: initialData.longDescription,
+        category: initialData.category,
+        technologies: Array.isArray(initialData.technologies) ? initialData.technologies.join(', ') : String(initialData.technologies || ''),
+        projectUrl: initialData.projectUrl || "",
+        sourceCodeUrl: initialData.sourceCodeUrl || "",
+        thumbnailUrl: initialData.thumbnailUrl || "",
+        previewUrl: initialData.previewUrl || "",
+        downloadUrl: initialData.downloadUrl || "",
+    } : computedDefaultValues);
+  }, [initialData, form.reset, computedDefaultValues]);
+
 
   async function onSubmit(values: ProjectFormData) {
     setIsSubmittingForm(true);
@@ -153,7 +166,7 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
               <FormItem>
                 <FormLabel>Categoría</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ej: Web App, Mobile App" {...field} disabled={isSubmittingForm} />
+                  <Input placeholder="Ej: App Web, App Móvil" {...field} disabled={isSubmittingForm} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -180,9 +193,9 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
           name="thumbnailUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL de Miniatura del Proyecto (Thumbnail)</FormLabel>
+              <FormLabel>URL de Miniatura del Proyecto</FormLabel>
               <FormControl>
-                <Input type="url" placeholder="https://ejemplo.com/thumbnail.jpg" {...field} disabled={isSubmittingForm} />
+                <Input type="url" placeholder="https://ejemplo.com/thumbnail.jpg" {...field} value={field.value || ''} disabled={isSubmittingForm} />
               </FormControl>
               <FormDescription>URL de la imagen para la tarjeta del proyecto (600x400px recomendado).</FormDescription>
               <FormMessage />
@@ -195,9 +208,9 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
           name="previewUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL de Imagen de Vista Previa (Preview)</FormLabel>
+              <FormLabel>URL de Imagen de Vista Previa</FormLabel>
               <FormControl>
-                <Input type="url" placeholder="https://ejemplo.com/preview.jpg" {...field} disabled={isSubmittingForm} />
+                <Input type="url" placeholder="https://ejemplo.com/preview.jpg" {...field} value={field.value || ''} disabled={isSubmittingForm} />
               </FormControl>
               <FormDescription>URL de la imagen para el modal del proyecto (1200x800px recomendado).</FormDescription>
               <FormMessage />
@@ -213,7 +226,7 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
               <FormItem>
                 <FormLabel>URL del Proyecto (Opcional)</FormLabel>
                 <FormControl>
-                  <Input type="url" placeholder="https://tuproyecto.com" {...field} disabled={isSubmittingForm}/>
+                  <Input type="url" placeholder="https://tuproyecto.com" {...field} value={field.value || ''} disabled={isSubmittingForm}/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -226,7 +239,7 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
               <FormItem>
                 <FormLabel>URL del Código Fuente (Opcional)</FormLabel>
                 <FormControl>
-                  <Input type="url" placeholder="https://github.com/tu/repo" {...field} disabled={isSubmittingForm} />
+                  <Input type="url" placeholder="https://github.com/tu/repo" {...field} value={field.value || ''} disabled={isSubmittingForm} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -241,7 +254,7 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
             <FormItem>
               <FormLabel>URL del Archivo Descargable (Opcional)</FormLabel>
               <FormControl>
-                <Input type="url" placeholder="https://ejemplo.com/proyecto.zip" {...field} disabled={isSubmittingForm} />
+                <Input type="url" placeholder="https://ejemplo.com/proyecto.zip" {...field} value={field.value || ''} disabled={isSubmittingForm} />
               </FormControl>
               <FormDescription>URL del archivo del proyecto para descargar (ej. .zip).</FormDescription>
               <FormMessage />

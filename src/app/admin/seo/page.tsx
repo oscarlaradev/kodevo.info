@@ -103,7 +103,7 @@ export default function SeoToolsPage() {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
-      console.error("Error generating SEO ideas:", errorMessage);
+      console.error("Error al generar ideas SEO:", errorMessage);
       setIdeasError(`Error: ${errorMessage}`);
       toast({
         title: "Error al Generar Ideas",
@@ -139,7 +139,7 @@ export default function SeoToolsPage() {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
-      console.error("Error generating meta tags:", errorMessage);
+      console.error("Error al generar meta tags:", errorMessage);
       setMetaTagsError(`Error: ${errorMessage}`);
       toast({
         title: "Error al Generar Meta Tags",
@@ -173,7 +173,7 @@ export default function SeoToolsPage() {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
-      console.error("Error generating related keywords:", errorMessage);
+      console.error("Error al generar palabras clave relacionadas:", errorMessage);
       setKeywordsError(`Error: ${errorMessage}`);
       toast({
         title: "Error al Generar Palabras Clave",
@@ -203,7 +203,7 @@ export default function SeoToolsPage() {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
-      console.error("Error analyzing PageSpeed:", errorMessage);
+      console.error("Error al analizar PageSpeed:", errorMessage);
       setPageSpeedError(`Error: ${errorMessage}`);
       toast({
         title: "Error en Análisis de PageSpeed",
@@ -233,7 +233,7 @@ export default function SeoToolsPage() {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
-      console.error("Error fetching Moz metrics:", errorMessage);
+      console.error("Error al obtener métricas de Moz:", errorMessage);
       setMozError(`Error: ${errorMessage}`);
       toast({
         title: "Error al Obtener Métricas de Moz",
@@ -274,7 +274,7 @@ export default function SeoToolsPage() {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
-      console.error("Error generating password:", errorMessage);
+      console.error("Error al generar contraseña:", errorMessage);
       setPasswordError(`Error: ${errorMessage}`);
       toast({
         title: "Error al Generar Contraseña",
@@ -293,7 +293,7 @@ export default function SeoToolsPage() {
           toast({ title: "Contraseña Copiada", description: "La contraseña generada ha sido copiada al portapapeles." });
         })
         .catch(err => {
-          console.error('Failed to copy password: ', err);
+          console.error('Fallo al copiar la contraseña: ', err);
           toast({ title: "Error al Copiar", description: "No se pudo copiar la contraseña.", variant: "destructive" });
         });
     }
@@ -325,7 +325,7 @@ export default function SeoToolsPage() {
         <Button asChild variant="outline">
             <Link href="/admin">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Volver al Dashboard
+                Volver al Panel
             </Link>
         </Button>
       </AdminPageHeader>
@@ -502,13 +502,13 @@ export default function SeoToolsPage() {
 
               {generatedMetaTitle && (
                 <div className="mt-4 space-y-1 pt-2 border-t">
-                  <Label htmlFor="generated-meta-title" className="font-semibold text-foreground">Meta Title Generado:</Label>
+                  <Label htmlFor="generated-meta-title" className="font-semibold text-foreground">Meta Título Generado:</Label>
                   <Input id="generated-meta-title" value={generatedMetaTitle} readOnly className="bg-muted/50" />
                 </div>
               )}
               {generatedMetaDescription && (
                 <div className="mt-2 space-y-1">
-                  <Label htmlFor="generated-meta-description" className="font-semibold text-foreground">Meta Description Generada:</Label>
+                  <Label htmlFor="generated-meta-description" className="font-semibold text-foreground">Meta Descripción Generada:</Label>
                   <Textarea id="generated-meta-description" value={generatedMetaDescription} readOnly className="h-20 bg-muted/50" />
                 </div>
               )}
@@ -893,5 +893,3 @@ export default function SeoToolsPage() {
     </div>
   );
 }
-
-    

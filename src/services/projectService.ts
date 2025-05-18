@@ -2,7 +2,7 @@
 // src/services/projectService.ts
 'use server';
 
-import { firestore } from '@/lib/firebase'; // Removed storage import as it's not used for uploads now
+import { firestore } from '@/lib/firebase'; 
 import {
   collection,
   addDoc,
@@ -15,11 +15,9 @@ import {
   deleteDoc,
   type DocumentData,
 } from 'firebase/firestore';
-// Removed Firebase Storage imports: ref as storageRef, uploadString, getDownloadURL, deleteObject
 import type { ProjectFormData } from '@/lib/schemas';
 import type { Project } from '@/lib/data';
 import { FirebaseError } from 'firebase/app';
-// Removed uuid import
 
 // Helper function to convert Firestore document data to Project type
 function mapDocToProject(docSnap: DocumentData, id: string): Project {
@@ -43,15 +41,13 @@ function mapDocToProject(docSnap: DocumentData, id: string): Project {
   };
 }
 
-// uploadFileFromDataUri function removed
-
 /**
  * Adds a new project to Firestore.
  * @param projectData The data for the new project from the form.
  * @returns The ID of the newly created project document.
  */
 export async function addProjectToFirestore(projectData: ProjectFormData): Promise<string> {
-  console.log('[Server Action] addProjectToFirestore called with:', JSON.stringify(projectData, null, 2));
+  console.log('[Acción de Servidor] addProjectToFirestore llamada con:', JSON.stringify(projectData, null, 2));
   try {
     const projectsCollectionRef = collection(firestore, 'projects');
     const technologiesArray = Array.isArray(projectData.technologies)
@@ -64,20 +60,20 @@ export async function addProjectToFirestore(projectData: ProjectFormData): Promi
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
-    console.log('[Server Action] Document data to be added:', JSON.stringify(docData, null, 2));
+    console.log('[Acción de Servidor] Datos del documento a añadir:', JSON.stringify(docData, null, 2));
     const docRef = await addDoc(projectsCollectionRef, docData);
-    console.log('[Server Action] Project added with ID:', docRef.id);
+    console.log('[Acción de Servidor] Proyecto añadido con ID:', docRef.id);
     return docRef.id;
   } catch (error) {
-    let errorMessage = "Failed to add project. An unknown error occurred.";
+    let errorMessage = "No se pudo añadir el proyecto. Ocurrió un error desconocido.";
     if (error instanceof FirebaseError) {
-      errorMessage = `Firebase error adding project: ${error.message} (Code: ${error.code})`;
-      console.error("[Server Action FirebaseError] Error adding project to Firestore: ", error.code, error.message, error.customData);
+      errorMessage = `Error de Firebase al añadir proyecto: ${error.message} (Código: ${error.code})`;
+      console.error("[Acción de Servidor FirebaseError] Error al añadir proyecto a Firestore: ", error.code, error.message, error.customData);
     } else if (error instanceof Error) {
-      errorMessage = `Failed to add project: ${error.message}.`;
-      console.error("[Server Action Error] Error adding project to Firestore: ", error.name, error.message, error.stack);
+      errorMessage = `No se pudo añadir el proyecto: ${error.message}.`;
+      console.error("[Acción de Servidor Error] Error al añadir proyecto a Firestore: ", error.name, error.message, error.stack);
     } else {
-      console.error("[Server Action Unknown Error] Error adding project to Firestore: ", error);
+      console.error("[Acción de Servidor Error Desconocido] Error al añadir proyecto a Firestore: ", error);
     }
     throw new Error(errorMessage);
   }
@@ -88,7 +84,7 @@ export async function addProjectToFirestore(projectData: ProjectFormData): Promi
  * @returns A promise that resolves to an array of projects.
  */
 export async function getProjectsFromFirestore(): Promise<Project[]> {
-  console.log('[Server Action] getProjectsFromFirestore called');
+  console.log('[Acción de Servidor] getProjectsFromFirestore llamada');
   try {
     const projectsCollectionRef = collection(firestore, 'projects');
     const querySnapshot = await getDocs(projectsCollectionRef);
@@ -96,18 +92,18 @@ export async function getProjectsFromFirestore(): Promise<Project[]> {
     const projects: Project[] = querySnapshot.docs.map(docSnap => {
       return mapDocToProject(docSnap, docSnap.id);
     });
-    console.log(`[Server Action] Fetched ${projects.length} projects.`);
+    console.log(`[Acción de Servidor] Obtenidos ${projects.length} proyectos.`);
     return projects;
   } catch (error) {
-    let errorMessage = "Failed to fetch projects. An unknown error occurred.";
+    let errorMessage = "No se pudieron obtener los proyectos. Ocurrió un error desconocido.";
     if (error instanceof FirebaseError) {
-      errorMessage = `Firebase error fetching projects: ${error.message} (Code: ${error.code})`;
-      console.error("[Server Action FirebaseError] Error fetching projects from Firestore: ", error.code, error.message, error.customData);
+      errorMessage = `Error de Firebase al obtener proyectos: ${error.message} (Código: ${error.code})`;
+      console.error("[Acción de Servidor FirebaseError] Error al obtener proyectos de Firestore: ", error.code, error.message, error.customData);
     } else if (error instanceof Error) {
-      errorMessage = `Failed to fetch projects: ${error.message}.`;
-      console.error("[Server Action Error] Error fetching projects from Firestore: ", error.name, error.message, error.stack);
+      errorMessage = `No se pudieron obtener los proyectos: ${error.message}.`;
+      console.error("[Acción de Servidor Error] Error al obtener proyectos de Firestore: ", error.name, error.message, error.stack);
     } else {
-      console.error("[Server Action Unknown Error] Error fetching projects from Firestore: ", error);
+      console.error("[Acción de Servidor Error Desconocido] Error al obtener proyectos de Firestore: ", error);
     }
     throw new Error(errorMessage);
   }
@@ -119,10 +115,10 @@ export async function getProjectsFromFirestore(): Promise<Project[]> {
  * @returns A promise that resolves to the project data or null if not found.
  */
 export async function getProjectByIdFromFirestore(projectId: string): Promise<Project | null> {
-  console.log(`[Server Action] getProjectByIdFromFirestore called for ID: ${projectId}`);
+  console.log(`[Acción de Servidor] getProjectByIdFromFirestore llamada para ID: ${projectId}`);
   if (!projectId || typeof projectId !== 'string' || projectId.trim() === '') {
-    const invalidIdErrorMsg = 'Invalid project ID provided to getProjectByIdFromFirestore.';
-    console.error('[Server Action Error]', invalidIdErrorMsg, 'Received:', projectId);
+    const invalidIdErrorMsg = 'ID de proyecto inválido proporcionado a getProjectByIdFromFirestore.';
+    console.error('[Acción de Servidor Error]', invalidIdErrorMsg, 'Recibido:', projectId);
     throw new Error(invalidIdErrorMsg);
   }
   try {
@@ -131,22 +127,22 @@ export async function getProjectByIdFromFirestore(projectId: string): Promise<Pr
 
     if (docSnap.exists()) {
       const project = mapDocToProject(docSnap, docSnap.id);
-      console.log(`[Server Action] Found project with ID ${projectId}`);
+      console.log(`[Acción de Servidor] Encontrado proyecto con ID ${projectId}`);
       return project;
     } else {
-      console.warn(`[Server Action] No such project document with ID: ${projectId}`);
+      console.warn(`[Acción de Servidor] No existe documento de proyecto con ID: ${projectId}`);
       return null;
     }
   } catch (error) {
-    let errorMessage = `Failed to fetch project with ID ${projectId}. An unknown error occurred.`;
+    let errorMessage = `No se pudo obtener el proyecto con ID ${projectId}. Ocurrió un error desconocido.`;
     if (error instanceof FirebaseError) {
-      errorMessage = `Firebase error fetching project ID ${projectId}: ${error.message} (Code: ${error.code})`;
-      console.error(`[Server Action FirebaseError] Error fetching project by ID ${projectId} from Firestore: `, error.code, error.message, error.customData);
+      errorMessage = `Error de Firebase al obtener proyecto ID ${projectId}: ${error.message} (Código: ${error.code})`;
+      console.error(`[Acción de Servidor FirebaseError] Error al obtener proyecto por ID ${projectId} de Firestore: `, error.code, error.message, error.customData);
     } else if (error instanceof Error) {
-      errorMessage = `Failed to fetch project with ID ${projectId}: ${error.message}.`;
-      console.error(`[Server Action Error] Error fetching project by ID ${projectId} from Firestore: `, error.name, error.message, error.stack);
+      errorMessage = `No se pudo obtener el proyecto con ID ${projectId}: ${error.message}.`;
+      console.error(`[Acción de Servidor Error] Error al obtener proyecto por ID ${projectId} de Firestore: `, error.name, error.message, error.stack);
     } else {
-      console.error(`[Server Action Unknown Error] Error fetching project by ID ${projectId} from Firestore: `, error);
+      console.error(`[Acción de Servidor Error Desconocido] Error al obtener proyecto por ID ${projectId} de Firestore: `, error);
     }
     throw new Error(errorMessage);
   }
@@ -159,10 +155,10 @@ export async function getProjectByIdFromFirestore(projectId: string): Promise<Pr
  * @returns A promise that resolves when the update is complete.
  */
 export async function updateProjectInFirestore(projectId: string, projectData: ProjectFormData): Promise<void> {
-  console.log(`[Server Action] updateProjectInFirestore called for ID: ${projectId} with data:`, JSON.stringify(projectData, null, 2));
+  console.log(`[Acción de Servidor] updateProjectInFirestore llamada para ID: ${projectId} con datos:`, JSON.stringify(projectData, null, 2));
    if (!projectId || typeof projectId !== 'string' || projectId.trim() === '') {
-    const invalidIdErrorMsg = 'Invalid project ID provided for update in updateProjectInFirestore.';
-    console.error('[Server Action Error]', invalidIdErrorMsg, 'Received:', projectId);
+    const invalidIdErrorMsg = 'ID de proyecto inválido proporcionado para actualizar en updateProjectInFirestore.';
+    console.error('[Acción de Servidor Error]', invalidIdErrorMsg, 'Recibido:', projectId);
     throw new Error(invalidIdErrorMsg);
   }
   try {
@@ -176,20 +172,20 @@ export async function updateProjectInFirestore(projectId: string, projectData: P
       technologies: technologiesArray,
       updatedAt: serverTimestamp(),
     };
-    console.log('[Server Action] Document data to be updated:', JSON.stringify(docData, null, 2));
+    console.log('[Acción de Servidor] Datos del documento a actualizar:', JSON.stringify(docData, null, 2));
     await updateDoc(projectDocRef, docData);
-    console.log(`[Server Action] Project with ID ${projectId} updated successfully.`);
+    console.log(`[Acción de Servidor] Proyecto con ID ${projectId} actualizado exitosamente.`);
   } catch (error)
  {
-    let errorMessage = `Failed to update project with ID ${projectId}. An unknown error occurred.`;
+    let errorMessage = `No se pudo actualizar el proyecto con ID ${projectId}. Ocurrió un error desconocido.`;
     if (error instanceof FirebaseError) {
-      errorMessage = `Firebase error updating project ID ${projectId}: ${error.message} (Code: ${error.code})`;
-      console.error(`[Server Action FirebaseError] Error updating project ${projectId} in Firestore: `, error.code, error.message, error.customData);
+      errorMessage = `Error de Firebase al actualizar proyecto ID ${projectId}: ${error.message} (Código: ${error.code})`;
+      console.error(`[Acción de Servidor FirebaseError] Error al actualizar proyecto ${projectId} en Firestore: `, error.code, error.message, error.customData);
     } else if (error instanceof Error) {
-      errorMessage = `Failed to update project with ID ${projectId}: ${error.message}.`;
-      console.error(`[Server Action Error] Error updating project ${projectId} in Firestore: `, error.name, error.message, error.stack);
+      errorMessage = `No se pudo actualizar el proyecto con ID ${projectId}: ${error.message}.`;
+      console.error(`[Acción de Servidor Error] Error al actualizar proyecto ${projectId} en Firestore: `, error.name, error.message, error.stack);
     } else {
-      console.error(`[Server Action Unknown Error] Error updating project ${projectId} in Firestore: `, error);
+      console.error(`[Acción de Servidor Error Desconocido] Error al actualizar proyecto ${projectId} en Firestore: `, error);
     }
     throw new Error(errorMessage);
   }
@@ -201,27 +197,26 @@ export async function updateProjectInFirestore(projectId: string, projectData: P
  * @returns A promise that resolves when the deletion is complete.
  */
 export async function deleteProjectFromFirestore(projectId: string): Promise<void> {
-  console.log(`[Server Action] deleteProjectFromFirestore called for ID: ${projectId}`);
+  console.log(`[Acción de Servidor] deleteProjectFromFirestore llamada para ID: ${projectId}`);
   if (!projectId || typeof projectId !== 'string' || projectId.trim() === '') {
-    const invalidIdErrorMsg = 'Invalid project ID provided for deletion.';
-    console.error('[Server Action Error]', invalidIdErrorMsg, 'Received:', projectId);
+    const invalidIdErrorMsg = 'ID de proyecto inválido proporcionado para eliminar.';
+    console.error('[Acción de Servidor Error]', invalidIdErrorMsg, 'Recibido:', projectId);
     throw new Error(invalidIdErrorMsg);
   }
   try {
-    // File deletion logic from Firebase Storage is removed
     const projectDocRef = doc(firestore, 'projects', projectId);
     await deleteDoc(projectDocRef);
-    console.log(`[Server Action] Project with ID ${projectId} deleted successfully from Firestore.`);
+    console.log(`[Acción de Servidor] Proyecto con ID ${projectId} eliminado exitosamente de Firestore.`);
   } catch (error) {
-    let errorMessage = `Failed to delete project with ID ${projectId}. An unknown error occurred.`;
+    let errorMessage = `No se pudo eliminar el proyecto con ID ${projectId}. Ocurrió un error desconocido.`;
     if (error instanceof FirebaseError) {
-      errorMessage = `Firebase error deleting project ID ${projectId}: ${error.message} (Code: ${error.code})`;
-      console.error(`[Server Action FirebaseError] Error deleting project ${projectId} from Firestore: `, error.code, error.message, error.customData);
+      errorMessage = `Error de Firebase al eliminar proyecto ID ${projectId}: ${error.message} (Código: ${error.code})`;
+      console.error(`[Acción de Servidor FirebaseError] Error al eliminar proyecto ${projectId} de Firestore: `, error.code, error.message, error.customData);
     } else if (error instanceof Error) {
-      errorMessage = `Failed to delete project with ID ${projectId}: ${error.message}.`;
-      console.error(`[Server Action Error] Error deleting project ${projectId} from Firestore: `, error.name, error.message, error.stack);
+      errorMessage = `No se pudo eliminar el proyecto con ID ${projectId}: ${error.message}.`;
+      console.error(`[Acción de Servidor Error] Error al eliminar proyecto ${projectId} de Firestore: `, error.name, error.message, error.stack);
     } else {
-      console.error(`[Server Action Unknown Error] Error deleting project ${projectId} from Firestore: `, error);
+      console.error(`[Acción de Servidor Error Desconocido] Error al eliminar proyecto ${projectId} de Firestore: `, error);
     }
     throw new Error(errorMessage);
   }

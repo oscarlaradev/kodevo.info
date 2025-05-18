@@ -28,7 +28,7 @@ const initialChartData: GaDataPoint[] = [
 
 const chartConfig = {
   pageViews: {
-    label: "Page Views",
+    label: "Vistas de Página",
     color: "hsl(var(--primary))",
     icon: LineChartIcon,
   },
@@ -93,7 +93,7 @@ export default function AnalyticsPage() {
         <Button asChild variant="outline">
             <Link href="/admin">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Volver al Dashboard
+                Volver al Panel
             </Link>
         </Button>
       </AdminPageHeader>

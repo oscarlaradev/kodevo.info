@@ -24,21 +24,21 @@ export interface BioData {
 }
 
 export const bioData: BioData = {
-  name: "Oscar Lara", // Updated name
-  title: "Senior Full-Stack Developer",
-  tagline: "Crafting elegant code, building performant applications.",
+  name: "Oscar Lara", // Name likely kept as is
+  title: "Desarrollador Full-Stack Senior",
+  tagline: "Creando código elegante, construyendo aplicaciones de alto rendimiento.",
   about:
-    "With over a decade of experience in the tech industry, I specialize in creating innovative and efficient web solutions. My passion lies in turning complex problems into simple, beautiful, and intuitive designs. I thrive in collaborative environments and am always eager to learn new technologies and methodologies to push the boundaries of what's possible.",
-  profilePictureUrl: "https://placehold.co/400x400.png",
-  skills: [
+    "Con más de una década de experiencia en la industria tecnológica, me especializo en crear soluciones web innovadoras y eficientes. Mi pasión radica en convertir problemas complejos en diseños simples, hermosos e intuitivos. Prospero en entornos colaborativos y siempre estoy ansioso por aprender nuevas tecnologías y metodologías para ampliar los límites de lo posible.",
+  profilePictureUrl: "https://placehold.co/400x400.png", // Assuming this placeholder URL is fine
+  skills: [ // Skill names are often kept in English or using common industry terms
     { name: "React & Next.js" },
     { name: "Node.js & Express" },
     { name: "TypeScript" },
     { name: "GraphQL & REST APIs" },
-    { name: "Database Design (SQL & NoSQL)" },
-    { name: "Cloud Platforms (AWS, Firebase)" },
-    { name: "UI/UX Principles" },
-    { name: "Agile Methodologies" },
+    { name: "Diseño de Bases de Datos (SQL & NoSQL)" },
+    { name: "Plataformas Cloud (AWS, Firebase)" },
+    { name: "Principios UI/UX" },
+    { name: "Metodologías Ágiles" },
   ],
   contact: [
     { platform: "GitHub", link: "https://github.com/oscarlaradev" },

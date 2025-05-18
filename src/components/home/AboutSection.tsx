@@ -1,3 +1,4 @@
+
 "use client";
 
 import { bioData } from '@/lib/data';
@@ -12,7 +13,7 @@ export function AboutSection() {
           <CardHeader className="bg-secondary/30 p-6">
             <div className="flex items-center space-x-3">
               <UserCircle className="h-8 w-8 text-primary" />
-              <CardTitle className="text-3xl font-semibold text-primary">About Me</CardTitle>
+              <CardTitle className="text-3xl font-semibold text-primary">Sobre Mí</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="p-6 md:p-8">

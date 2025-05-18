@@ -9,9 +9,9 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/s
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { label: 'Home', href: '/' },
-  { label: 'Projects', href: '/projects' },
-  { label: 'Favorites', href: '/favorites', icon: Heart }, // Added Favorites
+  { label: 'Inicio', href: '/' },
+  { label: 'Proyectos', href: '/projects' },
+  { label: 'Favoritos', href: '/favorites', icon: Heart }, // Added Favorites
 ];
 
 export function Header() {
@@ -36,7 +36,7 @@ export function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 md:h-20 items-center justify-between">
           <Link href="/" className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity">
-            CodeCanvas
+            Kodevo
           </Link>
 
           {/* Desktop Navigation */}
@@ -55,7 +55,7 @@ export function Header() {
           <div className="md:hidden">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Open menu">
+                <Button variant="ghost" size="icon" aria-label="Abrir menú">
                   <Menu className="h-6 w-6 text-primary" />
                 </Button>
               </SheetTrigger>
@@ -63,10 +63,10 @@ export function Header() {
                 <div className="flex flex-col h-full">
                   <div className="flex justify-between items-center mb-8">
                     <Link href="/" className="text-2xl font-bold text-primary" onClick={() => setIsMobileMenuOpen(false)}>
-                      CodeCanvas
+                      Kodevo
                     </Link>
                     <SheetClose asChild>
-                       <Button variant="ghost" size="icon" aria-label="Close menu">
+                       <Button variant="ghost" size="icon" aria-label="Cerrar menú">
                          <X className="h-6 w-6 text-primary" />
                        </Button>
                     </SheetClose>
@@ -87,7 +87,7 @@ export function Header() {
                   </nav>
                   <div className="mt-auto pt-6 border-t border-border">
                     <p className="text-center text-sm text-muted-foreground">
-                      &copy; {new Date().getFullYear()} CodeCanvas
+                      &copy; {new Date().getFullYear()} Kodevo
                     </p>
                   </div>
                 </div>

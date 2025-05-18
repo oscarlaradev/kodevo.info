@@ -7,17 +7,16 @@ import { useFavorites } from '@/hooks/use-favorites';
 import {
   Dialog,
   DialogContent,
-  DialogHeader, // Use standard DialogHeader
-  DialogTitle, // Use standard DialogTitle
-  DialogDescription, // Use standard DialogDescription
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-// Removed: import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Heart, ExternalLink, Github, Download } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-// Removed: import { useId } from 'react';
+
 
 interface ProjectModalProps {
   project: Project;
@@ -28,8 +27,6 @@ interface ProjectModalProps {
 export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
   const { toggleFavorite, isFavorite, isMounted } = useFavorites();
   const favorite = isMounted ? isFavorite(project.id) : false;
-  // Removed: const titleId = useId();
-  // Removed: const descriptionId = useId();
 
   let dataAiHintPreview = "project preview";
   if (project.title.toLowerCase().includes("ai")) dataAiHintPreview = "interface screenshot";
@@ -41,7 +38,6 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         className="sm:max-w-3xl md:max-w-4xl lg:max-w-5xl max-h-[90vh] p-0 rounded-xl shadow-2xl bg-card flex flex-col"
-        // Removed aria-labelledby and aria-describedby to let shadcn/Radix handle it
       >
         <DialogHeader className="p-6 pb-4 border-b border-border text-left">
           <DialogTitle className="text-3xl font-bold text-primary mb-1">
@@ -57,7 +53,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
             <div className="rounded-lg overflow-hidden shadow-lg aspect-video relative">
               <Image
                 src={project.previewUrl}
-                alt={`${project.title} preview`}
+                alt={`${project.title} vista previa`}
                 layout="fill"
                 objectFit="cover"
                 className="transition-transform duration-300 hover:scale-105"
@@ -66,12 +62,12 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Project Overview</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-3">Resumen del Proyecto</h3>
               <p className="text-foreground/80 leading-relaxed mb-6 text-sm">
                 {project.longDescription}
               </p>
 
-              <h4 className="text-lg font-semibold text-foreground mb-3">Technologies Used</h4>
+              <h4 className="text-lg font-semibold text-foreground mb-3">Tecnologías Utilizadas</h4>
               <div className="flex flex-wrap gap-2 mb-6">
                 {project.technologies.map((tech) => (
                   <Badge key={tech} variant="secondary" className="text-xs bg-secondary/50 text-secondary-foreground hover:bg-secondary/70">
@@ -88,14 +84,14 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
             {project.projectUrl && (
               <Button variant="outline" asChild className="rounded-lg shadow-sm hover:shadow-md">
                 <a href={project.projectUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="mr-2 h-4 w-4" /> Live Demo
+                  <ExternalLink className="mr-2 h-4 w-4" /> Demo en Vivo
                 </a>
               </Button>
             )}
             {project.sourceCodeUrl && (
               <Button variant="outline" asChild className="rounded-lg shadow-sm hover:shadow-md">
                 <a href={project.sourceCodeUrl} target="_blank" rel="noopener noreferrer">
-                  <Github className="mr-2 h-4 w-4" /> Source Code
+                  <Github className="mr-2 h-4 w-4" /> Código Fuente
                 </a>
               </Button>
             )}
@@ -112,9 +108,10 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
             variant={favorite ? 'default' : 'outline'}
             className="rounded-lg shadow-sm hover:shadow-md"
             aria-pressed={favorite}
+            title={favorite ? "Quitar de favoritos" : "Añadir a favoritos"}
           >
             <Heart className={`mr-2 h-4 w-4 ${favorite ? 'fill-current text-destructive-foreground' : ''}`} />
-            {favorite ? 'Favorited' : 'Add to Favorites'}
+            {favorite ? 'En Favoritos' : 'Añadir a Favoritos'}
           </Button>
         </DialogFooter>
       </DialogContent>

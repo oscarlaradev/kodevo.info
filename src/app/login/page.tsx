@@ -39,7 +39,7 @@ export default function LoginPage() {
     } catch (err) {
       const authError = err as Error;
       setError(authError.message || "Error al iniciar sesión. Verifica tus credenciales.");
-      console.error("Login page error:", authError);
+      console.error("Error en página de inicio de sesión:", authError);
     } finally {
       setIsLoading(false);
     }
@@ -50,8 +50,8 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-2xl rounded-xl">
         <CardHeader className="text-center">
           <LogIn className="mx-auto h-12 w-12 text-primary mb-3" />
-          <CardTitle className="text-3xl font-bold text-primary">Admin Login</CardTitle>
-          <CardDescription>Accede al panel de administración de CodeCanvas.</CardDescription>
+          <CardTitle className="text-3xl font-bold text-primary">Inicio de Sesión Admin</CardTitle>
+          <CardDescription>Accede al panel de administración de Kodevo.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -95,7 +95,7 @@ export default function LoginPage() {
           </form>
         </CardContent>
         <CardFooter className="text-center text-xs text-muted-foreground pt-4">
-          <p>&copy; {new Date().getFullYear()} CodeCanvas. Acceso restringido.</p>
+          <p>&copy; {new Date().getFullYear()} Kodevo. Acceso restringido.</p>
         </CardFooter>
       </Card>
     </div>

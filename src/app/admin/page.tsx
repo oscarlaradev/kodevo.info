@@ -34,7 +34,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <AdminPageHeader title="Panel de Administración" description="Bienvenido al panel de control de CodeCanvas." />
+      <AdminPageHeader title="Panel de Administración" description="Bienvenido al panel de control de Kodevo." />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {features.map((feature) => (

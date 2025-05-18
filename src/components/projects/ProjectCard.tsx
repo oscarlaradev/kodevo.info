@@ -49,7 +49,8 @@ export function ProjectCard({ project, onViewProject }: ProjectCardProps) {
               e.stopPropagation(); // Prevent triggering onViewProject if card itself is clickable
               toggleFavorite(project.id);
             }}
-            aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+            aria-label={favorite ? "Quitar de favoritos" : "Añadir a favoritos"}
+            title={favorite ? "Quitar de favoritos" : "Añadir a favoritos"}
             aria-pressed={favorite}
           >
             <Heart className={`h-5 w-5 ${favorite ? 'fill-destructive text-destructive' : 'text-muted-foreground group-hover:text-destructive'}`} />
@@ -69,7 +70,7 @@ export function ProjectCard({ project, onViewProject }: ProjectCardProps) {
           ))}
           {project.technologies.length > 3 && (
             <Badge variant="outline" className="text-xs border-primary/50 text-primary/80">
-              +{project.technologies.length - 3} more
+              +{project.technologies.length - 3} más
             </Badge>
           )}
         </div>
@@ -80,7 +81,7 @@ export function ProjectCard({ project, onViewProject }: ProjectCardProps) {
           className="w-full rounded-lg shadow-md hover:shadow-lg transform transition-all hover:scale-105"
           variant="default"
         >
-          <Eye className="mr-2 h-4 w-4" /> View Details
+          <Eye className="mr-2 h-4 w-4" /> Ver Detalles
         </Button>
       </CardFooter>
     </Card>

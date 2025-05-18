@@ -64,7 +64,7 @@ export async function analyzePageSpeed(input: PageSpeedInputClient): Promise<Pag
   const apiKey = process.env.GOOGLE_PAGESPEED_API_KEY;
 
   if (!apiKey) {
-    console.error('Google PageSpeed API Key is not configured in environment variables.');
+    console.error('La clave API de Google PageSpeed no está configurada en las variables de entorno.');
     throw new Error('La clave API de Google PageSpeed no está configurada en el servidor.');
   }
 
@@ -73,7 +73,7 @@ export async function analyzePageSpeed(input: PageSpeedInputClient): Promise<Pag
   // For now, focusing on PERFORMANCE.
 
   try {
-    console.log(`[PageSpeed Service] Fetching URL: ${apiUrl.replace(apiKey, 'YOUR_API_KEY')}`);
+    console.log(`[Servicio PageSpeed] Obteniendo URL: ${apiUrl.replace(apiKey, 'TU_CLAVE_API')}`);
     const response = await fetch(apiUrl);
     
     const responseText = await response.text(); // Get raw response text for debugging if JSON fails
@@ -84,10 +84,10 @@ export async function analyzePageSpeed(input: PageSpeedInputClient): Promise<Pag
         errorData = JSON.parse(responseText);
       } catch (e) {
         // If parsing errorData itself fails
-        console.error("[PageSpeed Service] API response was not OK, and response body was not valid JSON:", responseText);
+        console.error("[Servicio PageSpeed] La respuesta de la API no fue OK, y el cuerpo de la respuesta no era JSON válido:", responseText);
         throw new Error(`Error de la API de PageSpeed: ${response.status} ${response.statusText}. Respuesta no válida del servidor.`);
       }
-      console.error("[PageSpeed Service] API Error Response:", errorData);
+      console.error("[Servicio PageSpeed] Respuesta de Error de la API:", errorData);
       throw new Error(`Error de la API de PageSpeed: ${response.status} ${response.statusText}. ${errorData.error?.message || 'Mensaje de error no disponible.'}`);
     }
     
@@ -95,14 +95,14 @@ export async function analyzePageSpeed(input: PageSpeedInputClient): Promise<Pag
     try {
       data = JSON.parse(responseText);
     } catch(e) {
-      console.error("[PageSpeed Service] Failed to parse JSON response from PageSpeed API:", responseText);
+      console.error("[Servicio PageSpeed] Fallo al parsear la respuesta JSON de la API de PageSpeed:", responseText);
       throw new Error("Respuesta inesperada de la API de PageSpeed (no es JSON válido).");
     }
 
     const lighthouseResultValidation = PageSpeedLighthouseResultSchema.safeParse(data.lighthouseResult);
 
     if (!lighthouseResultValidation.success) {
-        console.error("[PageSpeed Service] PageSpeed API response parsing error (Zod):", lighthouseResultValidation.error.flatten());
+        console.error("[Servicio PageSpeed] Error al parsear la respuesta de la API de PageSpeed (Zod):", lighthouseResultValidation.error.flatten());
         throw new Error('No se pudo analizar la estructura de la respuesta de la API de PageSpeed. La estructura puede haber cambiado.');
     }
     
@@ -120,7 +120,7 @@ export async function analyzePageSpeed(input: PageSpeedInputClient): Promise<Pag
       strategy: strategy,
     };
   } catch (error) {
-    console.error("[PageSpeed Service] Error analyzing page speed:", error);
+    console.error("[Servicio PageSpeed] Error al analizar la velocidad de la página:", error);
     if (error instanceof Error) {
       // Avoid re-wrapping if it's already a meaningful error
       if(error.message.startsWith('Error de la API de PageSpeed:') || error.message.startsWith('Datos de entrada no válidos:') || error.message.startsWith('La clave API de Google PageSpeed no está configurada')) {

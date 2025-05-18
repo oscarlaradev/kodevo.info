@@ -20,12 +20,12 @@ export function ContactSection() {
           <CardHeader className="bg-secondary/30 p-6">
             <div className="flex items-center space-x-3">
               <Send className="h-8 w-8 text-primary" />
-              <CardTitle className="text-3xl font-semibold text-primary">Get In Touch</CardTitle>
+              <CardTitle className="text-3xl font-semibold text-primary">Ponte en Contacto</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="p-6 md:p-8">
             <p className="text-lg text-center text-foreground/90 mb-8">
-              I&apos;m always open to discussing new projects, creative ideas or opportunities to be part of your visions.
+              Siempre estoy abierto a discutir nuevos proyectos, ideas creativas u oportunidades para ser parte de tus visiones.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               {bioData.contact.map((item) => {
@@ -40,7 +40,7 @@ export function ContactSection() {
                   >
                     <a href={item.link} target="_blank" rel="noopener noreferrer">
                       <Icon className="mr-2 h-5 w-5" />
-                      {item.platform}
+                      {item.platform === "Email" ? "Correo" : item.platform}
                     </a>
                   </Button>
                 );

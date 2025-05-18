@@ -41,14 +41,14 @@ export async function getMozUrlMetrics(input: MozUrlMetricsInput): Promise<MozUr
   const mozApiAuth = process.env.MOZ_API_BASE64_AUTH;
 
   if (!mozApiAuth) {
-    console.error('Moz API Base64 Auth string is not configured in environment variables (MOZ_API_BASE64_AUTH).');
+    console.error('La cadena de autenticación Base64 de la API de Moz no está configurada en las variables de entorno (MOZ_API_BASE64_AUTH).');
     throw new Error('La autenticación de la API de Moz no está configurada en el servidor.');
   }
 
   const apiUrl = 'https://lsapi.seomoz.com/v2/url_metrics';
   
   try {
-    console.log(`[Moz Service] Fetching URL Metrics for: ${url}`);
+    console.log(`[Servicio Moz] Obteniendo Métricas de URL para: ${url}`);
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -69,10 +69,10 @@ export async function getMozUrlMetrics(input: MozUrlMetricsInput): Promise<MozUr
       try {
         errorData = JSON.parse(responseText);
       } catch (e) {
-        console.error("[Moz Service] API response was not OK, and response body was not valid JSON:", responseText);
+        console.error("[Servicio Moz] La respuesta de la API no fue OK, y el cuerpo de la respuesta no era JSON válido:", responseText);
         throw new Error(`Error de la API de Moz: ${response.status} ${response.statusText}. Respuesta no válida del servidor.`);
       }
-      console.error("[Moz Service] API Error Response:", errorData);
+      console.error("[Servicio Moz] Respuesta de Error de la API:", errorData);
       const mozErrorMessage = errorData?.message || errorData?.error_message || 'Mensaje de error no disponible de Moz.';
       throw new Error(`Error de la API de Moz: ${response.status} ${response.statusText}. ${mozErrorMessage}`);
     }
@@ -81,14 +81,14 @@ export async function getMozUrlMetrics(input: MozUrlMetricsInput): Promise<MozUr
     try {
       data = JSON.parse(responseText);
     } catch (e) {
-      console.error("[Moz Service] Failed to parse JSON response from Moz API:", responseText);
+      console.error("[Servicio Moz] Fallo al parsear la respuesta JSON de la API de Moz:", responseText);
       throw new Error("Respuesta inesperada de la API de Moz (no es JSON válido).");
     }
     
     const parsedData = MozApiResponseSchema.safeParse(data);
 
     if (!parsedData.success || !parsedData.data.results || parsedData.data.results.length === 0) {
-      console.error("[Moz Service] Moz API response parsing error (Zod) or no results:", parsedData.success ? 'No results array or empty results' : parsedData.error.flatten());
+      console.error("[Servicio Moz] Error al parsear la respuesta de la API de Moz (Zod) o no hay resultados:", parsedData.success ? 'No hay array de resultados o está vacío' : parsedData.error.flatten());
       throw new Error('No se pudo analizar la estructura de la respuesta de la API de Moz o no se encontraron resultados.');
     }
 
@@ -102,7 +102,7 @@ export async function getMozUrlMetrics(input: MozUrlMetricsInput): Promise<MozUr
     };
 
   } catch (error) {
-    console.error("[Moz Service] Error fetching Moz URL metrics:", error);
+    console.error("[Servicio Moz] Error al obtener métricas de URL de Moz:", error);
     if (error instanceof Error) {
         if(error.message.startsWith('Error de la API de Moz:') || error.message.startsWith('Datos de entrada no válidos:') || error.message.startsWith('La autenticación de la API de Moz no está configurada')) {
             throw error;

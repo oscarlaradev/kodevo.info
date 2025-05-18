@@ -1,11 +1,11 @@
 
 'use server';
 /**
- * @fileOverview A Genkit flow to generate SEO meta tags.
+ * @fileOverview Un flujo de Genkit para generar meta tags SEO.
  *
- * - generateMetaTags - A function that generates a meta title and description based on a topic or content.
- * - MetaTagsInput - The input type for the generateMetaTags function.
- * - MetaTagsOutput - The return type for the generateMetaTags function.
+ * - generateMetaTags - Una función que genera un meta título y descripción basados en un tema o contenido.
+ * - MetaTagsInput - El tipo de entrada para la función generateMetaTags.
+ * - MetaTagsOutput - El tipo de retorno para la función generateMetaTags.
  */
 
 import {ai} from '@/ai/genkit';
