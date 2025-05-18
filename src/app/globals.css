@@ -104,4 +104,33 @@
       transform: translateY(0);
     }
   }
+
+  /* Minimalist Scrollbar Styles */
+  /* For WebKit-based browsers (Chrome, Safari, newer Edge) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background) / 0.5); /* Slightly transparent background */
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.5); /* Muted foreground, semi-transparent */
+    border-radius: 10px;
+    border: 2px solid hsl(var(--background) / 0.5); /* Creates a "floating" effect */
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.8); /* Darker on hover */
+  }
+
+  /* For Firefox */
+  /* Firefox scrollbar styling is more limited but we can set basic colors and width */
+  html { /* Apply to html for broader effect in Firefox */
+    scrollbar-width: thin; /* "auto" or "thin" */
+    scrollbar-color: hsl(var(--muted-foreground) / 0.5) hsl(var(--background) / 0.5); /* thumb and track color */
+  }
 }
