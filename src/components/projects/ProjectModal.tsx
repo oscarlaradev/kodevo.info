@@ -16,7 +16,7 @@ interface ProjectModalProps {
 }
 
 export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
-  const { toggleFavorite, isFavorite, isMounted }_ = useFavorites();
+  const { toggleFavorite, isFavorite, isMounted } = useFavorites(); // Corrected this line
   const favorite = isMounted ? isFavorite(project.id) : false;
 
   // Determine placeholder hint based on project category or title for preview image
