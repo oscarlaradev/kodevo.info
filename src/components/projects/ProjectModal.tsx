@@ -1,12 +1,13 @@
+
 "use client";
 
 import Image from 'next/image';
 import type { Project } from '@/lib/data';
 import { useFavorites } from '@/hooks/use-favorites';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, Heart, ExternalLink, X, Github } from 'lucide-react';
+import { Heart, ExternalLink, Github } from 'lucide-react'; // Removed X as it's provided by DialogContent
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ProjectModalProps {
@@ -16,7 +17,7 @@ interface ProjectModalProps {
 }
 
 export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
-  const { toggleFavorite, isFavorite, isMounted } = useFavorites(); // Corrected this line
+  const { toggleFavorite, isFavorite, isMounted } = useFavorites();
   const favorite = isMounted ? isFavorite(project.id) : false;
 
   // Determine placeholder hint based on project category or title for preview image
@@ -34,12 +35,8 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
             <DialogTitle className="text-3xl font-bold text-primary">{project.title}</DialogTitle>
             <DialogDescription className="text-muted-foreground mt-1">{project.category}</DialogDescription>
           </div>
-          <DialogClose asChild>
-            <Button variant="ghost" size="icon" className="rounded-full -mt-2 -mr-2 text-muted-foreground hover:text-primary hover:bg-primary/10">
-              <X className="h-5 w-5" />
-              <span className="sr-only">Close</span>
-            </Button>
-          </DialogClose>
+          {/* The explicit DialogClose and Button with X icon has been removed here. 
+              DialogContent from shadcn/ui provides its own close button by default. */}
         </DialogHeader>
         
         <ScrollArea className="flex-grow overflow-y-auto">
@@ -84,7 +81,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                 </a>
               </Button>
             )}
-            {project.sourceCodeUrl && ( // Assuming download is source code
+            {project.sourceCodeUrl && ( 
               <Button variant="outline" asChild className="rounded-lg shadow-sm hover:shadow-md">
                 <a href={project.sourceCodeUrl} target="_blank" rel="noopener noreferrer">
                   <Github className="mr-2 h-4 w-4" /> Source Code
