@@ -1,11 +1,13 @@
+
 "use client";
 
 import Image from 'next/image';
 import type { Project } from '@/lib/data';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye } from 'lucide-react';
+import { Eye, Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useFavorites } from '@/hooks/use-favorites'; // Import useFavorites
 
 interface ProjectCardProps {
   project: Project;
@@ -13,6 +15,9 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, onViewProject }: ProjectCardProps) {
+  const { toggleFavorite, isFavorite, isMounted } = useFavorites();
+  const favorite = isMounted ? isFavorite(project.id) : false;
+
   // Determine placeholder hint based on project category or title
   let dataAiHint = "project technology"; // Default hint
   if (project.title.toLowerCase().includes("ai")) dataAiHint = "artificial intelligence";
@@ -22,7 +27,7 @@ export function ProjectCard({ project, onViewProject }: ProjectCardProps) {
 
 
   return (
-    <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out rounded-xl overflow-hidden transform hover:-translate-y-1 animate-fade-in-up">
+    <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out rounded-xl overflow-hidden transform hover:-translate-y-1 animate-fade-in-up relative group">
       <CardHeader className="p-0 relative">
         <Image
           src={project.thumbnailUrl}
@@ -35,6 +40,21 @@ export function ProjectCard({ project, onViewProject }: ProjectCardProps) {
          <div className="absolute top-2 right-2">
           <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm text-primary font-semibold">{project.category}</Badge>
         </div>
+        {isMounted && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 left-2 bg-background/70 hover:bg-background/90 text-foreground rounded-full p-1.5 z-10 shadow-md hover:shadow-lg transition-all"
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent triggering onViewProject if card itself is clickable
+              toggleFavorite(project.id);
+            }}
+            aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+            aria-pressed={favorite}
+          >
+            <Heart className={`h-5 w-5 ${favorite ? 'fill-destructive text-destructive' : 'text-muted-foreground group-hover:text-destructive'}`} />
+          </Button>
+        )}
       </CardHeader>
       <CardContent className="p-6 flex-grow">
         <CardTitle className="text-2xl font-semibold text-primary mb-2">{project.title}</CardTitle>

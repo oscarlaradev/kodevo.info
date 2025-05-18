@@ -1,7 +1,8 @@
+
 "use client";
 
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Heart } from 'lucide-react'; // Added Heart for Favorites
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
@@ -10,6 +11,7 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { label: 'Home', href: '/' },
   { label: 'Projects', href: '/projects' },
+  { label: 'Favorites', href: '/favorites', icon: Heart }, // Added Favorites
 ];
 
 export function Header() {
@@ -38,10 +40,13 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-4">
+          <nav className="hidden md:flex space-x-2">
             {navItems.map((item) => (
-              <Button key={item.label} variant="ghost" asChild className="text-foreground hover:text-primary hover:bg-primary/10 rounded-md px-4 py-2 transition-colors">
-                <Link href={item.href}>{item.label}</Link>
+              <Button key={item.label} variant="ghost" asChild className="text-foreground hover:text-primary hover:bg-primary/10 rounded-md px-3 py-2 transition-colors">
+                <Link href={item.href}>
+                  {item.icon && <item.icon className="mr-2 h-4 w-4" />}
+                  {item.label}
+                </Link>
               </Button>
             ))}
           </nav>
@@ -66,14 +71,15 @@ export function Header() {
                        </Button>
                     </SheetClose>
                   </div>
-                  <nav className="flex flex-col space-y-4">
+                  <nav className="flex flex-col space-y-3">
                     {navItems.map((item) => (
                        <SheetClose key={item.label} asChild>
                         <Link
                           href={item.href}
-                          className="block px-4 py-3 rounded-md text-lg text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                          className="flex items-center px-4 py-3 rounded-md text-lg text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
+                          {item.icon && <item.icon className="mr-3 h-5 w-5" />}
                           {item.label}
                         </Link>
                        </SheetClose>
