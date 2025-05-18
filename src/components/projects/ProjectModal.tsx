@@ -4,7 +4,15 @@
 import Image from 'next/image';
 import type { Project } from '@/lib/data';
 import { useFavorites } from '@/hooks/use-favorites';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  // DialogTitle, // We will use DialogPrimitive.Title directly
+  // DialogDescription, // We will use DialogPrimitive.Description directly
+  DialogFooter,
+} from '@/components/ui/dialog';
+import * as DialogPrimitive from "@radix-ui/react-dialog"; // Import primitives
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Heart, ExternalLink, Github, Download } from 'lucide-react';
@@ -23,8 +31,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
   const titleId = useId();
   const descriptionId = useId();
 
-  // Determine placeholder hint based on project category or title for preview image
-  let dataAiHintPreview = "project preview"; // Default hint
+  let dataAiHintPreview = "project preview";
   if (project.title.toLowerCase().includes("ai")) dataAiHintPreview = "interface screenshot";
   else if (project.category.toLowerCase().includes("web")) dataAiHintPreview = "website mockup";
   else if (project.category.toLowerCase().includes("ui")) dataAiHintPreview = "design system";
@@ -37,14 +44,13 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
       >
-        <DialogHeader className="p-6 pb-4 text-left"> {/* Adjusted padding and ensured text-left */}
-          <DialogTitle id={titleId} className="text-3xl font-bold text-primary">{project.title}</DialogTitle>
-          <DialogDescription id={descriptionId} className="text-muted-foreground mt-1">{project.category}</DialogDescription>
+        <DialogHeader className="p-6 pb-4 text-left border-b border-border">
+          <DialogPrimitive.Title id={titleId} className="text-3xl font-bold text-primary">{project.title}</DialogPrimitive.Title>
+          <DialogPrimitive.Description id={descriptionId} className="text-muted-foreground mt-1">{project.category}</DialogPrimitive.Description>
         </DialogHeader>
 
         <ScrollArea className="flex-grow overflow-y-auto">
-          <div className="p-6 pt-0 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start"> {/* Adjusted pt-0 as pb-4 is on header */}
-            {/* Left Side: Preview Image */}
+          <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
             <div className="rounded-lg overflow-hidden shadow-lg aspect-video relative">
               <Image
                 src={project.previewUrl}
@@ -56,7 +62,6 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
               />
             </div>
 
-            {/* Right Side: Description and Details */}
             <div>
               <h3 className="text-xl font-semibold text-foreground mb-3">Project Overview</h3>
               <p className="text-foreground/80 leading-relaxed mb-6 text-sm">
@@ -91,7 +96,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                 </a>
               </Button>
             )}
-            {project.downloadUrl && project.downloadUrl !== "#" && ( // Also check if not just a placeholder '#'
+            {project.downloadUrl && project.downloadUrl !== "#" && (
               <Button variant="outline" asChild className="rounded-lg shadow-sm hover:shadow-md">
                 <a href={project.downloadUrl} target="_blank" rel="noopener noreferrer" download>
                   <Download className="mr-2 h-4 w-4" /> Descargar Proyecto
