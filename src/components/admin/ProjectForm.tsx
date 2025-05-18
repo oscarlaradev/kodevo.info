@@ -5,7 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { ProjectFormData } from "@/lib/schemas";
 import { projectSchema } from "@/lib/schemas";
-import { addProjectToFirestore } from "@/services/projectService"; // Import the service
+import { addProjectToFirestore, updateProjectInFirestore } from "@/services/projectService"; 
+import type { Project } from "@/lib/data"; // For initialData prop
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,27 +22,31 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
-// import { useRouter } from 'next/navigation'; // Uncomment if redirection is needed
+import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
 interface ProjectFormProps {
-  initialData?: Partial<ProjectFormData> & { technologies?: string[] | string };
-  onSubmitSuccess?: (projectId: string) => void; // Pass projectId on success
+  // initialData can be a full Project object (when editing) or undefined (when new)
+  initialData?: Project; 
+  onSubmitSuccess?: (projectId: string) => void;
 }
 
 export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) {
   const { toast } = useToast();
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const router = useRouter(); // Uncomment for redirection
+  const isEditMode = !!initialData?.id;
 
+  // Prepare defaultValues for the form. If editing, map Project to ProjectFormData shape.
+  // Technologies need to be a comma-separated string for the form input.
   const computedDefaultValues = {
     title: initialData?.title || "",
     shortDescription: initialData?.shortDescription || "",
     longDescription: initialData?.longDescription || "",
     category: initialData?.category || "",
-    technologies: Array.isArray(initialData?.technologies)
-      ? initialData.technologies.join(', ')
-      : (typeof initialData?.technologies === 'string' ? initialData.technologies : ""),
+    technologies: initialData?.technologies 
+      ? (Array.isArray(initialData.technologies) ? initialData.technologies.join(', ') : initialData.technologies) 
+      : "",
     projectUrl: initialData?.projectUrl || "",
     sourceCodeUrl: initialData?.sourceCodeUrl || "",
     thumbnailUrl: initialData?.thumbnailUrl || "https://placehold.co/600x400.png",
@@ -54,22 +59,40 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
     defaultValues: computedDefaultValues,
   });
   
+  // Reset form if initialData changes (e.g., navigating between new/edit or data loads)
+  useEffect(() => {
+    form.reset(computedDefaultValues);
+  }, [initialData, form.reset]);
+
   async function onSubmit(values: ProjectFormData) {
     setIsSubmitting(true);
     try {
-      // Call the service function to add to Firestore
-      const projectId = await addProjectToFirestore(values);
-      toast({
-        title: "Proyecto Guardado en Firebase",
-        description: `El proyecto "${values.title}" ha sido guardado con ID: ${projectId}.`,
-        variant: "default",
-      });
-
-      if (onSubmitSuccess) {
-        onSubmitSuccess(projectId);
+      let projectId = initialData?.id;
+      if (isEditMode && projectId) {
+        await updateProjectInFirestore(projectId, values);
+        toast({
+          title: "Proyecto Actualizado",
+          description: `El proyecto "${values.title}" ha sido actualizado en Firebase.`,
+          variant: "default",
+        });
+      } else {
+        projectId = await addProjectToFirestore(values);
+        toast({
+          title: "Proyecto Guardado en Firebase",
+          description: `El proyecto "${values.title}" ha sido guardado con ID: ${projectId}.`,
+          variant: "default",
+        });
+        form.reset(); // Reset form only on successful new submission
       }
-      form.reset(); // Reset form after successful submission
-      // Optionally redirect: router.push('/admin/projects');
+
+      if (onSubmitSuccess && projectId) {
+        onSubmitSuccess(projectId);
+      } else {
+        // Default success behavior: redirect to projects list
+        router.push('/admin/projects');
+        router.refresh(); // To ensure the project list re-fetches
+      }
+      
     } catch (error) {
       console.error("Error saving project:", error);
       toast({
@@ -162,7 +185,7 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
                 <FormControl>
                     <Input 
                       placeholder="Ej: React, Next.js, Firebase" 
-                      {...field} 
+                      {...field} // Field value will be a string here
                     />
                 </FormControl>
                 <FormDescription>
@@ -185,7 +208,7 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
                     <Input placeholder="https://placehold.co/600x400.png" {...field} data-ai-hint="project thumbnail"/>
                 </FormControl>
                 <FormDescription>
-                    Imagen para la tarjeta del proyecto (600x400px recomendado).
+                    Imagen para la tarjeta del proyecto (600x400px recomendado). Próximamente: subida de archivos.
                 </FormDescription>
                 <FormMessage />
                 </FormItem>
@@ -202,7 +225,7 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
                     <Input placeholder="https://placehold.co/1200x800.png" {...field} data-ai-hint="project preview"/>
                 </FormControl>
                 <FormDescription>
-                    Imagen para el modal del proyecto (1200x800px recomendado).
+                    Imagen para el modal del proyecto (1200x800px recomendado). Próximamente: subida de archivos.
                 </FormDescription>
                 <FormMessage />
                 </FormItem>
@@ -256,7 +279,7 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
                 <Input placeholder="https://ejemplo.com/descargas/proyecto.zip" {...field} />
               </FormControl>
               <FormDescription>
-                Enlace directo al archivo del proyecto para descargar (ej. un .zip). La subida de archivos se implementará más adelante.
+                Enlace directo al archivo del proyecto para descargar. Próximamente: subida de archivos.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -267,10 +290,10 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Guardando...
+              {isEditMode ? "Actualizando..." : "Guardando..."}
             </>
           ) : (
-            "Guardar Proyecto"
+            isEditMode ? "Actualizar Proyecto" : "Guardar Proyecto"
           )}
         </Button>
       </form>

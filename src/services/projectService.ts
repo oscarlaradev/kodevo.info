@@ -1,13 +1,31 @@
 // src/services/projectService.ts
-'use server'; // For potential future use if called from Server Actions, though primarily client-side for now
+'use server'; 
 
 import { firestore } from '@/lib/firebase';
-import { collection, addDoc, getDocs, doc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, serverTimestamp, Timestamp, getDoc, updateDoc, DocumentData } from 'firebase/firestore';
 import type { ProjectFormData } from '@/lib/schemas';
-import type { Project } from '@/lib/data'; // Using existing Project type
+import type { Project } from '@/lib/data'; 
 
-// Firestore typically stores dates as Timestamps. If you add date fields, adjust accordingly.
-// For now, our ProjectFormData and Project types don't have explicit date fields managed by this service.
+// Helper function to convert Firestore document data to Project type
+function mapDocToProject(docSnap: DocumentData, id: string): Project {
+  const data = docSnap.data();
+  return {
+    id: id,
+    title: data?.title || '',
+    shortDescription: data?.shortDescription || '',
+    longDescription: data?.longDescription || '',
+    category: data?.category || '',
+    technologies: Array.isArray(data?.technologies) ? data.technologies : [],
+    thumbnailUrl: data?.thumbnailUrl || 'https://placehold.co/600x400.png',
+    previewUrl: data?.previewUrl || 'https://placehold.co/1200x800.png',
+    projectUrl: data?.projectUrl || undefined,
+    sourceCodeUrl: data?.sourceCodeUrl || undefined,
+    downloadUrl: data?.downloadUrl || undefined,
+    // Optionally convert Timestamps if you add them to the Project type
+    // createdAt: (data?.createdAt as Timestamp)?.toDate(),
+    // updatedAt: (data?.updatedAt as Timestamp)?.toDate(),
+  };
+}
 
 /**
  * Adds a new project to Firestore.
@@ -17,16 +35,15 @@ import type { Project } from '@/lib/data'; // Using existing Project type
 export async function addProjectToFirestore(projectData: ProjectFormData): Promise<string> {
   try {
     const projectsCollectionRef = collection(firestore, 'projects');
-    // You might want to add a createdAt/updatedAt timestamp
     const docRef = await addDoc(projectsCollectionRef, {
       ...projectData,
-      // technologies field is already an array string[] from Zod transform
-      createdAt: serverTimestamp(), // Automatically adds a server-side timestamp
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
     return docRef.id;
   } catch (error) {
     console.error("Error adding project to Firestore: ", error);
-    throw new Error("Failed to add project."); // Re-throw for the caller to handle
+    throw new Error("Failed to add project.");
   }
 }
 
@@ -40,30 +57,54 @@ export async function getProjectsFromFirestore(): Promise<Project[]> {
     const querySnapshot = await getDocs(projectsCollectionRef);
     
     const projects: Project[] = querySnapshot.docs.map(docSnap => {
-      const data = docSnap.data();
-      // Ensure all fields match the Project interface, handling potential undefined fields from Firestore
-      return {
-        id: docSnap.id,
-        title: data.title || '',
-        shortDescription: data.shortDescription || '',
-        longDescription: data.longDescription || '',
-        category: data.category || '',
-        technologies: Array.isArray(data.technologies) ? data.technologies : [],
-        thumbnailUrl: data.thumbnailUrl || 'https://placehold.co/600x400.png',
-        previewUrl: data.previewUrl || 'https://placehold.co/1200x800.png',
-        projectUrl: data.projectUrl || undefined,
-        sourceCodeUrl: data.sourceCodeUrl || undefined,
-        downloadUrl: data.downloadUrl || undefined,
-        // If you have a createdAt field as Firestore Timestamp, you might want to convert it
-        // createdAt: (data.createdAt as Timestamp)?.toDate().toISOString(), // Example conversion
-      } as Project; // Cast to Project type
+      return mapDocToProject(docSnap, docSnap.id);
     });
     return projects;
   } catch (error) {
     console.error("Error fetching projects from Firestore: ", error);
-    // Depending on how you want to handle errors, you might return [] or throw
     return []; 
   }
 }
 
-// TODO: Implement updateProject and deleteProject functions later
+/**
+ * Fetches a single project by its ID from Firestore.
+ * @param projectId The ID of the project to fetch.
+ * @returns A promise that resolves to the project data or null if not found.
+ */
+export async function getProjectByIdFromFirestore(projectId: string): Promise<Project | null> {
+  try {
+    const projectDocRef = doc(firestore, 'projects', projectId);
+    const docSnap = await getDoc(projectDocRef);
+
+    if (docSnap.exists()) {
+      return mapDocToProject(docSnap, docSnap.id);
+    } else {
+      console.log("No such project document!");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching project by ID from Firestore: ", error);
+    throw new Error("Failed to fetch project.");
+  }
+}
+
+/**
+ * Updates an existing project in Firestore.
+ * @param projectId The ID of the project to update.
+ * @param projectData The new data for the project.
+ * @returns A promise that resolves when the update is complete.
+ */
+export async function updateProjectInFirestore(projectId: string, projectData: ProjectFormData): Promise<void> {
+  try {
+    const projectDocRef = doc(firestore, 'projects', projectId);
+    await updateDoc(projectDocRef, {
+      ...projectData,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error updating project in Firestore: ", error);
+    throw new Error("Failed to update project.");
+  }
+}
+
+// TODO: Implement deleteProjectFromFirestore function later

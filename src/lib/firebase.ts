@@ -6,13 +6,13 @@ import { getFirestore, type Firestore } from 'firebase/firestore';
 
 // TODO: Replace with your actual Firebase project configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-  measurementId: "YOUR_MEASUREMENT_ID" // Optional
+  apiKey: "AIzaSyDvtKReGj7zIX5Ep_RlHInWKCpQvWvJ7NE",
+  authDomain: "kick-1626294198830.firebaseapp.com",
+  projectId: "kick-1626294198830",
+  storageBucket: "kick-1626294198830.firebasestorage.app",
+  messagingSenderId: "482374412279",
+  appId: "1:482374412279:web:1f415433f6d440e51f70f2",
+  measurementId: "G-0HMWRZVYKV"
 };
 
 let app: FirebaseApp;
