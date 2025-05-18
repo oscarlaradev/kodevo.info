@@ -54,7 +54,8 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
     symbols: symbols.toString(),
   });
 
-  const endpointUrl = `https://${apiHost}/api/v1/strong?${queryParams.toString()}`;
+  // Corrected endpoint URL: removed /v1
+  const endpointUrl = `https://${apiHost}/api/strong?${queryParams.toString()}`;
   
   try {
     console.log(`[Password Generator Service] Fetching URL: ${endpointUrl.replace(apiKey, 'YOUR_RAPIDAPI_KEY')}`);
