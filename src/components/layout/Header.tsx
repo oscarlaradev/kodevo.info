@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Menu, X, Heart } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet'; // Added SheetHeader, SheetTitle
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -40,11 +40,16 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-2">
+          <nav className="hidden md:flex space-x-1">
             {navItems.map((item) => (
-              <Button key={item.label} variant="ghost" asChild className="text-foreground hover:text-primary hover:bg-primary/10 rounded-md px-3 py-2 transition-colors">
+              <Button 
+                key={item.label} 
+                variant="ghost" 
+                asChild 
+                className="group text-muted-foreground hover:text-primary transition-colors duration-200 rounded-md px-3 py-2"
+              >
                 <Link href={item.href}>
-                  {item.icon && <item.icon className="mr-2 h-4 w-4" />}
+                  {item.icon && <item.icon className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />}
                   {item.label}
                 </Link>
               </Button>
@@ -60,31 +65,25 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[280px] bg-background p-0 shadow-xl rounded-l-xl flex flex-col">
-                {/* SheetContent provides its own close button, so we don't need an explicit one inside the header */}
                 <SheetHeader className="p-6 pb-4 border-b border-border">
                   <div className="flex justify-between items-center">
                     <Link href="/" className="text-2xl font-bold text-primary" onClick={() => setIsMobileMenuOpen(false)}>
                       Kodevo
                     </Link>
-                    {/* The SheetClose below was causing the duplicate X, 
-                        SheetContent already provides a close button. 
-                        If it's not visible, it's a styling issue with SheetContent's default.
-                        For now, relying on SheetContent's default close button.
-                    */}
                   </div>
                   <SheetTitle className="sr-only">Menú de Navegación Principal</SheetTitle>
                 </SheetHeader>
                 
                 <div className="flex flex-col h-full p-6 pt-4">
-                  <nav className="flex flex-col space-y-3">
+                  <nav className="flex flex-col space-y-2">
                     {navItems.map((item) => (
                        <SheetClose key={item.label} asChild>
                         <Link
                           href={item.href}
-                          className="flex items-center px-4 py-3 rounded-md text-lg text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                          className="group flex items-center px-4 py-3 rounded-md text-lg text-foreground hover:bg-muted hover:text-primary transition-colors"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
-                          {item.icon && <item.icon className="mr-3 h-5 w-5" />}
+                          {item.icon && <item.icon className="mr-3 h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />}
                           {item.label}
                         </Link>
                        </SheetClose>
