@@ -13,9 +13,16 @@ const PasswordGeneratorInputSchema = z.object({
 export type PasswordGeneratorInput = z.infer<typeof PasswordGeneratorInputSchema>;
 
 const PasswordGeneratorOutputSchema = z.object({
-  randomPassword: z.string(),
+  randomPassword: z.string().min(1, "La contraseña generada no puede estar vacía."), // Ensure our service returns a non-empty password
 });
 export type PasswordGeneratorOutput = z.infer<typeof PasswordGeneratorOutputSchema>;
+
+// Schema for the actual response from RapidAPI
+const RapidApiResponseSchema = z.object({
+  status: z.boolean(),
+  message: z.string(),
+  password: z.string(), // This can be empty in the API response
+});
 
 export async function generateRandomPassword(input: PasswordGeneratorInput): Promise<PasswordGeneratorOutput> {
   const validatedInput = PasswordGeneratorInputSchema.safeParse(input);
@@ -63,46 +70,64 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
     });
 
     const responseText = await response.text();
-    console.log("[Password Generator Service] Raw responseText from API:", `"${responseText}"`); // Log raw response
+    console.log("[Password Generator Service] Raw responseText from API:", `"${responseText}"`);
 
     if (!response.ok) {
       console.error("[Password Generator Service] API response was not OK. Status:", response.status, "Response Text:", responseText);
-      if (response.status === 400 && responseText.includes("Any of one input is required")) {
-           throw new Error(`Error de la API de RapidAPI: ${responseText.trim()}`);
-      }
       throw new Error(`Error de la API de RapidAPI: ${response.status} ${response.statusText}. Detalle: ${responseText.trim()}`);
     }
     
-    // Directly use the responseText, assuming it's the password, and trim it.
-    const extractedPassword = responseText.trim();
-    console.log("[Password Generator Service] Extracted password (after trim):", `"${extractedPassword}"`);
-
-    if (!extractedPassword) {
-      console.error("[Password Generator Service] Extracted password string is empty after trimming.");
-      throw new Error('La API devolvió una respuesta vacía o inválida después de procesar.');
+    let jsonData;
+    try {
+      jsonData = JSON.parse(responseText);
+    } catch (e) {
+      console.error("[Password Generator Service] Failed to parse JSON response from RapidAPI:", responseText, e);
+      // If parsing fails, but API said OK, it might be plain text after all.
+      // This case is unlikely given the new JSON response you saw, but as a fallback:
+      if (responseText.trim()) {
+         console.log("[Password Generator Service] Assuming plain text password due to JSON parse failure:", responseText.trim());
+         return { randomPassword: responseText.trim() };
+      }
+      throw new Error('Respuesta inesperada de la API de RapidAPI (no es JSON válido y está vacía).');
     }
 
-    // A simple check: if the "successful" message is the entire response, then the API isn't giving the password.
-    if (extractedPassword.toLowerCase().includes("password generated successfully")) {
-        console.warn("[Password Generator Service] API responded with success message but not the password itself.");
-        // This might mean the API expects different params or has an issue.
-        // For now, we'll throw an error indicating this.
-        // throw new Error('La API indicó éxito pero no devolvió una contraseña. Verifica los logs del servidor.');
-        // OR, if the API sometimes returns THIS and the password, we need a more complex parsing.
-        // For now, let's assume if this message is present, the password is NOT the message itself.
-        // This part needs to be verified with actual API response.
-        // If "Password generated successfully." IS the response, then the API is not working as expected.
+    console.log("[Password Generator Service] Parsed JSON data from API:", jsonData);
+
+    const parsedRapidApiResponse = RapidApiResponseSchema.safeParse(jsonData);
+
+    if (!parsedRapidApiResponse.success) {
+      console.error("[Password Generator Service] Zod parsing error for RapidAPI response structure:", parsedRapidApiResponse.error.flatten());
+      throw new Error('No se pudo analizar la estructura de la respuesta de la API de RapidAPI.');
     }
 
+    const { status, message, password: apiPassword } = parsedRapidApiResponse.data;
+
+    if (status === true && apiPassword === "") {
+      console.warn("[Password Generator Service] API reported success (status:true) but returned an empty password string. Message from API:", message);
+      throw new Error(`La API generó la contraseña exitosamente pero no devolvió caracteres. Mensaje de la API: "${message}". Verifica los parámetros de tipo de caracter.`);
+    }
+    
+    if (status === false || !apiPassword) {
+         console.error("[Password Generator Service] API reported failure or empty password. Status:", status, "Message:", message, "Password:", apiPassword);
+         throw new Error(`La API de RapidAPI no pudo generar una contraseña. Mensaje: "${message || 'Razón desconocida'}"`);
+    }
+    
+    console.log("[Password Generator Service] Successfully extracted password:", `"${apiPassword}"`);
 
     return {
-      randomPassword: extractedPassword,
+      randomPassword: apiPassword,
     };
 
   } catch (error) {
     console.error("[Password Generator Service] Error in generateRandomPassword:", error);
     if (error instanceof Error) {
-        if(error.message.startsWith('Error de la API de RapidAPI:') || error.message.startsWith('Datos de entrada no válidos:') || error.message.startsWith('Configuración del servidor incompleta') || error.message.startsWith('La API devolvió una respuesta vacía')) {
+        if(error.message.startsWith('Error de la API de RapidAPI:') || 
+           error.message.startsWith('Datos de entrada no válidos:') || 
+           error.message.startsWith('Configuración del servidor incompleta') ||
+           error.message.startsWith('La API generó la contraseña exitosamente pero no devolvió caracteres') ||
+           error.message.startsWith('No se pudo analizar la estructura de la respuesta') ||
+           error.message.startsWith('La API de RapidAPI no pudo generar una contraseña')
+          ) {
             throw error;
           }
       throw new Error(`No se pudo generar la contraseña: ${error.message}`);
