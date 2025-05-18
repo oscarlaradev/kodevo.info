@@ -160,27 +160,6 @@ export default function AnalyticsPage() {
           )}
         </CardContent>
       </Card>
-
-      <Card className="shadow-lg rounded-lg">
-        <CardHeader>
-            <CardTitle className="text-xl font-semibold flex items-center">
-                <AlertTriangle className="mr-2 h-6 w-6 text-primary" />
-                Notas Importantes sobre Google Analytics
-            </CardTitle>
-        </CardHeader>
-        <CardContent>
-            <p className="text-muted-foreground">
-                Esta integración intenta obtener datos de tu propiedad de Google Analytics 4.
-            </p>
-            <ul className="list-disc list-inside space-y-1 text-muted-foreground mt-2 pl-4">
-                <li>Asegúrate de haber seguido todos los pasos de configuración de la cuenta de servicio y permisos en GA4.</li>
-                <li>Las variables de entorno `GA4_PROPERTY_ID` y `GOOGLE_SERVICE_ACCOUNT_KEY_JSON` deben estar correctamente configuradas en tu archivo `.env.local`.</li>
-                <li>Los datos de Google Analytics pueden tener un retraso de procesamiento (hasta 24-48 horas). Si acabas de configurar GA4, es posible que no veas datos inmediatamente.</li>
-                <li>Este gráfico muestra "Vistas de Página" (screenPageViews) de los últimos 7 días. Para más métricas o rangos de fechas, el servicio y la UI necesitarían ser extendidos.</li>
-                <li>Verifica la consola del servidor Next.js para mensajes de error detallados si la carga de datos falla.</li>
-            </ul>
-        </CardContent>
-      </Card>
     </div>
   );
 }
