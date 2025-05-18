@@ -41,7 +41,6 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
     throw new Error('Configuración del servidor incompleta para el generador de contraseñas.');
   }
 
-  // Construct query parameters
   const queryParams = new URLSearchParams();
   queryParams.append('length', passwordLength.toString());
   if (uppercase) queryParams.append('uppercase', 'on');
@@ -70,7 +69,6 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
         errorData = JSON.parse(responseText);
       } catch (e) {
         console.error("[Password Generator Service] API response was not OK, and response body was not valid JSON:", responseText, "Status:", response.status);
-        // If the response is the error message directly (like "Any of one input is required.")
         if (response.status === 400 && responseText.includes("Any of one input is required")) {
              throw new Error(`Error de la API de RapidAPI: ${responseText}`);
         }
@@ -83,6 +81,8 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
     
     let passwordString = '';
     try {
+        // Esta API en particular a menudo devuelve la contraseña directamente como texto.
+        // Si JSON.parse falla, asumimos que responseText es la contraseña.
         const jsonData = JSON.parse(responseText);
         if (jsonData.random_password) {
             passwordString = jsonData.random_password;
@@ -91,6 +91,7 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
         } else if (typeof jsonData === 'string') { 
              passwordString = jsonData;
         } else {
+            // Intenta encontrar cualquier propiedad de cadena si es un objeto JSON inesperado
             const firstStringProp = Object.values(jsonData).find(val => typeof val === 'string');
             if (firstStringProp) {
                 passwordString = firstStringProp as string;
@@ -100,6 +101,7 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
             }
         }
     } catch (e) {
+        // Si JSON.parse falla, es probable que responseText sea la contraseña directamente (texto plano)
         if (typeof responseText === 'string' && responseText.trim().length > 0) {
             passwordString = responseText.trim();
         } else {
@@ -113,17 +115,11 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
       throw new Error('La API devolvió una contraseña vacía.');
     }
 
-    // Sanitize the password string if it contains HTML entities (sometimes these APIs return them)
-    const sanitizedPassword = passwordString.replace(/&[#A-Za-z0-9]+;/gi, (entity) => {
-      const textarea = document.createElement('textarea');
-      textarea.innerHTML = entity;
-      return textarea.value;
-    });
-
+    // La sanitización basada en `document.createElement` fue eliminada porque no funciona en Server Actions.
+    // Se asume que la API devuelve una contraseña limpia.
 
     return {
-      // randomPassword: passwordString,
-      randomPassword: sanitizedPassword, // Use sanitized password
+      randomPassword: passwordString,
     };
 
   } catch (error) {
