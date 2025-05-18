@@ -14,6 +14,7 @@ export const projectSchema = z.object({
   sourceCodeUrl: z.string().url({ message: "Por favor, introduce una URL válida para el código fuente." }).optional().or(z.literal('')),
   thumbnailUrl: z.string().url({ message: "Por favor, introduce una URL válida para la miniatura." }).min(1, { message: "La URL de la miniatura es obligatoria." }),
   previewUrl: z.string().url({ message: "Por favor, introduce una URL válida para la vista previa." }).min(1, { message: "La URL de la vista previa es obligatoria." }),
+  downloadUrl: z.string().url({ message: "Por favor, introduce una URL válida para el archivo descargable." }).optional().or(z.literal('')),
 });
 
 export type ProjectFormData = z.infer<typeof projectSchema>;

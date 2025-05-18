@@ -7,6 +7,7 @@ export interface Project {
   previewUrl: string; // URL to a larger preview image or live site screenshot
   projectUrl?: string; // Link to live project
   sourceCodeUrl?: string; // Link to GitHub repo
+  downloadUrl?: string; // Link to downloadable project file (e.g., zip)
   technologies: string[];
   category: string; // e.g., "Web App", "Mobile App", "Tool"
 }
@@ -56,6 +57,7 @@ export const projectsData: Project[] = [
     previewUrl: "https://placehold.co/1200x800.png",
     projectUrl: "#",
     sourceCodeUrl: "#",
+    downloadUrl: "#", // Placeholder for actual download link
     technologies: ["Next.js", "TypeScript", "Python", "Flask", "AI/ML", "Vercel"],
     category: "Web App",
   },
@@ -69,6 +71,7 @@ export const projectsData: Project[] = [
     previewUrl: "https://placehold.co/1200x800.png",
     projectUrl: "#",
     sourceCodeUrl: "#",
+    // No downloadUrl for this project example
     technologies: ["React", "Three.js", "Node.js", "API Integration"],
     category: "Web App",
   },
@@ -82,6 +85,7 @@ export const projectsData: Project[] = [
     previewUrl: "https://placehold.co/1200x800.png",
     projectUrl: "#",
     sourceCodeUrl: "#",
+    downloadUrl: "#", // Placeholder
     technologies: ["React", "Tailwind CSS", "Storybook", "Figma"],
     category: "UI Kit",
   },
@@ -94,6 +98,7 @@ export const projectsData: Project[] = [
     thumbnailUrl: "https://placehold.co/600x400.png",
     previewUrl: "https://placehold.co/1200x800.png",
     sourceCodeUrl: "#",
+    // No downloadUrl for this project example
     technologies: ["Electron", "React", "Cryptography", "SQLite"],
     category: "Desktop App",
   },

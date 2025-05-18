@@ -23,7 +23,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 interface ProjectFormProps {
-  initialData?: Partial<ProjectFormData>; // For editing later
+  initialData?: Partial<ProjectFormData> & { technologies?: string[] | string }; // Allow string for initial tech for flexibility
   onSubmitSuccess?: (data: ProjectFormData) => void;
 }
 
@@ -31,19 +31,20 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Compute defaultValues correctly, ensuring technologies is a string for the form input
+  // Compute defaultValues correctly
   const computedDefaultValues = {
     title: initialData?.title || "",
     shortDescription: initialData?.shortDescription || "",
     longDescription: initialData?.longDescription || "",
     category: initialData?.category || "",
-    technologies: (initialData?.technologies && Array.isArray(initialData.technologies))
-      ? initialData.technologies.join(', ') // For editing: convert string[] from ProjectFormData to string
-      : (initialData?.technologies as unknown as string || ""), // Handle if initialData.technologies is already a string, or default to empty string for new
+    technologies: Array.isArray(initialData?.technologies)
+      ? initialData.technologies.join(', ')
+      : (initialData?.technologies as string || ""), // Handle if it's already a string or empty
     projectUrl: initialData?.projectUrl || "",
     sourceCodeUrl: initialData?.sourceCodeUrl || "",
     thumbnailUrl: initialData?.thumbnailUrl || "https://placehold.co/600x400.png",
     previewUrl: initialData?.previewUrl || "https://placehold.co/1200x800.png",
+    downloadUrl: (initialData as any)?.downloadUrl || "", // Cast to any if downloadUrl is not yet in ProjectFormData for initialData
   };
 
   const form = useForm<ProjectFormData>({
@@ -241,6 +242,23 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
             )}
             />
         </div>
+        
+        <FormField
+          control={form.control}
+          name="downloadUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL del Archivo Descargable (Opcional)</FormLabel>
+              <FormControl>
+                <Input placeholder="https://ejemplo.com/descargas/proyecto.zip" {...field} />
+              </FormControl>
+              <FormDescription>
+                Enlace directo al archivo del proyecto para descargar (ej. un .zip). La subida de archivos se implementará más adelante.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
           {isSubmitting ? (

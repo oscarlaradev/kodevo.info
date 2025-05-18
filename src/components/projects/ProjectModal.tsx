@@ -7,7 +7,7 @@ import { useFavorites } from '@/hooks/use-favorites';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, ExternalLink, Github } from 'lucide-react'; // Removed X as it's provided by DialogContent
+import { Heart, ExternalLink, Github, Download } from 'lucide-react'; // Added Download
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ProjectModalProps {
@@ -35,8 +35,6 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
             <DialogTitle className="text-3xl font-bold text-primary">{project.title}</DialogTitle>
             <DialogDescription className="text-muted-foreground mt-1">{project.category}</DialogDescription>
           </div>
-          {/* The explicit DialogClose and Button with X icon has been removed here. 
-              DialogContent from shadcn/ui provides its own close button by default. */}
         </DialogHeader>
         
         <ScrollArea className="flex-grow overflow-y-auto">
@@ -85,6 +83,13 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
               <Button variant="outline" asChild className="rounded-lg shadow-sm hover:shadow-md">
                 <a href={project.sourceCodeUrl} target="_blank" rel="noopener noreferrer">
                   <Github className="mr-2 h-4 w-4" /> Source Code
+                </a>
+              </Button>
+            )}
+            {project.downloadUrl && project.downloadUrl !== "#" && ( // Also check if not just a placeholder '#'
+              <Button variant="outline" asChild className="rounded-lg shadow-sm hover:shadow-md">
+                <a href={project.downloadUrl} target="_blank" rel="noopener noreferrer" download>
+                  <Download className="mr-2 h-4 w-4" /> Descargar Proyecto
                 </a>
               </Button>
             )}
