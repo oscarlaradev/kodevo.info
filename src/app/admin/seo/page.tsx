@@ -9,8 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch'; // Added Switch
-import { ArrowLeft, Search, FileText, Lightbulb, Settings2, BarChart3, Loader2, AlertTriangle, Wand2, Smartphone, Monitor, ShieldCheck, ExternalLink, KeyRound, Copy } from "lucide-react"; // Added KeyRound, Copy
+import { Switch } from '@/components/ui/switch';
+import { ArrowLeft, Search, FileText, Lightbulb, Settings2, BarChart3, Loader2, AlertTriangle, Wand2, Smartphone, Monitor, ShieldCheck, ExternalLink, KeyRound, Copy, Info } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import {
   Accordion,
@@ -32,7 +32,7 @@ import { generateMetaTags, type MetaTagsInput } from '@/ai/flows/generate-meta-t
 import { generateRelatedKeywords, type RelatedKeywordsInput } from '@/ai/flows/generate-related-keywords-flow';
 import { analyzePageSpeed, type PageSpeedInputClient, type PageSpeedOutput } from '@/services/pageSpeedService';
 import { getMozUrlMetrics, type MozUrlMetricsInput, type MozUrlMetricsOutput } from '@/services/mozService';
-import { generateRandomPassword, type PasswordGeneratorInput, type PasswordGeneratorOutput } from '@/services/randomPasswordGeneratorService'; // Added
+import { generateRandomPassword, type PasswordGeneratorInput, type PasswordGeneratorOutput } from '@/services/randomPasswordGeneratorService';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SeoToolsPage() {
@@ -715,63 +715,183 @@ export default function SeoToolsPage() {
 
       </div>
 
-      <Separator className="my-8" />
+      <Separator className="my-10" />
 
-      <Card className="shadow-lg rounded-lg">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">Conceptos Clave de SEO para Portafolios</CardTitle>
-          <CardDescription>Consejos esenciales para mejorar la visibilidad de tu trabajo.</CardDescription>
+      <Card className="shadow-xl rounded-xl">
+        <CardHeader className="bg-primary/10">
+          <div className="flex items-center gap-3">
+            <Info className="h-8 w-8 text-primary" />
+            <CardTitle className="text-2xl font-bold text-primary">Conceptos Clave de SEO para Portafolios</CardTitle>
+          </div>
+          <CardDescription className="text-base text-primary/80 mt-1">Consejos esenciales y avanzados para mejorar la visibilidad de tu trabajo en línea.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Accordion type="single" collapsible className="w-full">
+        <CardContent className="p-6 md:p-8">
+          <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
             <AccordionItem value="item-1">
-              <AccordionTrigger className="text-base font-medium hover:no-underline">Títulos y Descripciones Únicos</AccordionTrigger>
-              <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
-                Cada proyecto y página debe tener un título (<code className="font-mono text-xs bg-muted p-1 rounded">&lt;title&gt;</code>) y una meta descripción únicos.
-                Los títulos deben ser concisos (idealmente menos de 60 caracteres), y las descripciones atractivas (idealmente menos de 160 caracteres).
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-foreground">
+                <Search className="mr-3 h-5 w-5 text-primary/80" /> Investigación de Palabras Clave Específica
+              </AccordionTrigger>
+              <AccordionContent className="text-md text-muted-foreground leading-relaxed pt-2 pl-8">
+                Identifica los términos que clientes potenciales o reclutadores usarían para encontrar a alguien con tus habilidades o los proyectos que has realizado.
+                Piensa en:
+                <ul className="list-disc list-inside mt-2 space-y-1 pl-4">
+                  <li>Tecnologías específicas (Ej: "desarrollador Next.js freelance", "experto en Firebase y React").</li>
+                  <li>Tipos de proyectos (Ej: "desarrollo de e-commerce", "aplicaciones móviles con React Native").</li>
+                  <li>Problemas que resuelves (Ej: "optimización de rendimiento web", "consultoría en arquitectura de software").</li>
+                </ul>
+                Usa estas palabras clave de forma natural en los títulos de tus proyectos, descripciones y en tu biografía.
               </AccordionContent>
             </AccordionItem>
+
             <AccordionItem value="item-2">
-              <AccordionTrigger className="text-base font-medium hover:no-underline">URLs Amigables (Semánticas)</AccordionTrigger>
-              <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
-                Usa URLs cortas y descriptivas que incluyan palabras clave relevantes. Por ejemplo: <code className="font-mono text-xs bg-muted p-1 rounded">/projects/nombre-proyecto-seo</code>.
-                Next.js facilita esto con su sistema de enrutamiento basado en archivos.
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-foreground">
+                <Settings2 className="mr-3 h-5 w-5 text-primary/80" /> Títulos y Descripciones Únicos y Atractivos
+              </AccordionTrigger>
+              <AccordionContent className="text-md text-muted-foreground leading-relaxed pt-2 pl-8">
+                Cada proyecto y página (incluyendo tu "Sobre mí" y "Contacto") debe tener un meta título (<code className="font-mono text-sm bg-muted p-1 rounded">&lt;title&gt;</code>) y una meta descripción únicos.
+                <ul className="list-disc list-inside mt-2 space-y-1 pl-4">
+                  <li><strong>Meta Títulos:</strong> Concisos (50-60 caracteres), que incluyan tu palabra clave principal y transmitan el valor principal. Deben ser atractivos para el clic.</li>
+                  <li><strong>Meta Descripciones:</strong> Persuasivas (150-160 caracteres), que expandan el título, incluyan palabras clave secundarias y llamen a la acción (ej. "Descubre cómo desarrollé...", "Contacta para colaborar...").</li>
+                </ul>
+                Evita títulos y descripciones duplicados o genéricos.
               </AccordionContent>
             </AccordionItem>
+
             <AccordionItem value="item-3">
-              <AccordionTrigger className="text-base font-medium hover:no-underline">Optimización de Imágenes</AccordionTrigger>
-              <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
-                Comprime las imágenes para reducir su tamaño de archivo sin perder demasiada calidad. Utiliza el componente <code className="font-mono text-xs bg-muted p-1 rounded">next/image</code> para una optimización automática.
-                Añade texto <code className="font-mono text-xs bg-muted p-1 rounded">alt</code> descriptivo a todas las imágenes, incluyendo palabras clave cuando sea natural.
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-foreground">
+                 <ExternalLink className="mr-3 h-5 w-5 text-primary/80" /> URLs Amigables y Semánticas
+              </AccordionTrigger>
+              <AccordionContent className="text-md text-muted-foreground leading-relaxed pt-2 pl-8">
+                Utiliza URLs cortas, descriptivas y que incluyan palabras clave relevantes. Esto ayuda tanto a los usuarios como a los motores de búsqueda a entender de qué trata la página.
+                <ul className="list-disc list-inside mt-2 space-y-1 pl-4">
+                  <li>Ejemplo para un proyecto: <code className="font-mono text-sm bg-muted p-1 rounded">/projects/nombre-del-proyecto-con-palabras-clave</code></li>
+                  <li>Evita URLs con parámetros innecesarios o IDs numéricos si es posible.</li>
+                </ul>
+                Next.js facilita la creación de URLs semánticas con su sistema de enrutamiento basado en archivos.
               </AccordionContent>
             </AccordionItem>
-             <AccordionItem value="item-4">
-              <AccordionTrigger className="text-base font-medium hover:no-underline">Contenido de Calidad y Estructura</AccordionTrigger>
-              <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
-                Describe tus proyectos en detalle, destacando los problemas que resolviste y las tecnologías utilizadas. Usa encabezados (H1, H2, H3) para estructurar el contenido de forma lógica.
-                Incorpora palabras clave relevantes de forma natural a lo largo de tu contenido.
+
+            <AccordionItem value="item-4">
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-foreground">
+                <FileText className="mr-3 h-5 w-5 text-primary/80" /> Optimización de Imágenes y Multimedia
+              </AccordionTrigger>
+              <AccordionContent className="text-md text-muted-foreground leading-relaxed pt-2 pl-8">
+                Las imágenes son cruciales en un portafolio, pero pueden ralentizar tu sitio si no se optimizan.
+                <ul className="list-disc list-inside mt-2 space-y-1 pl-4">
+                  <li><strong>Compresión:</strong> Usa herramientas para comprimir imágenes sin perder calidad visible (ej. TinyPNG, ImageOptim).</li>
+                  <li><strong>Formatos Modernos:</strong> Considera formatos como WebP que ofrecen mejor compresión (el componente <code className="font-mono text-sm bg-muted p-1 rounded">next/image</code> puede ayudar con esto).</li>
+                  <li><strong>Texto Alternativo (Atributo `alt`):</strong> Siempre incluye texto `alt` descriptivo para todas las imágenes. Debe describir la imagen e incluir palabras clave si es natural. Ayuda a la accesibilidad y al SEO.</li>
+                  <li><strong>Dimensiones Correctas:</strong> Sirve imágenes en las dimensiones en que se mostrarán para evitar que el navegador las redimensione.</li>
+                  <li><strong>Lazy Loading:</strong> Carga imágenes solo cuando están a punto de entrar en el viewport (el componente <code className="font-mono text-sm bg-muted p-1 rounded">next/image</code> lo hace por defecto).</li>
+                </ul>
               </AccordionContent>
             </AccordionItem>
+
             <AccordionItem value="item-5">
-              <AccordionTrigger className="text-base font-medium hover:no-underline">Enlaces Internos y Externos</AccordionTrigger>
-              <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
-                Enlaza a otras páginas relevantes dentro de tu propio sitio (enlaces internos) para ayudar a los motores de búsqueda a descubrir tu contenido y distribuir la autoridad de la página.
-                Obtener enlaces de calidad desde otros sitios web (backlinks) es un factor importante para el SEO, aunque más difícil de controlar directamente.
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-foreground">
+                 <Lightbulb className="mr-3 h-5 w-5 text-primary/80" /> Contenido de Calidad, Estructura y Frescura
+              </AccordionTrigger>
+              <AccordionContent className="text-md text-muted-foreground leading-relaxed pt-2 pl-8">
+                El contenido es el rey. Para tu portafolio:
+                <ul className="list-disc list-inside mt-2 space-y-1 pl-4">
+                  <li><strong>Descripciones Detalladas de Proyectos:</strong> No te limites a mostrar imágenes. Explica el problema que resolviste, tu proceso, los desafíos y las tecnologías utilizadas. Usa las palabras clave que investigaste.</li>
+                  <li><strong>Estructura Lógica con Encabezados:</strong> Usa encabezados (H1, H2, H3, etc.) para organizar tu contenido. El H1 es el más importante y debe ser único por página.</li>
+                  <li><strong>Contenido Original:</strong> Evita copiar y pegar descripciones de otros sitios.</li>
+                  <li><strong>Actualizaciones Regulares:</strong> Añade nuevos proyectos, actualiza los existentes, o escribe artículos de blog (si tienes uno) sobre tus aprendizajes. Google valora el contenido fresco y relevante.</li>
+                </ul>
               </AccordionContent>
             </AccordionItem>
-             <AccordionItem value="item-6">
-              <AccordionTrigger className="text-base font-medium hover:no-underline">Velocidad de Carga y Experiencia Móvil</AccordionTrigger>
-              <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
-                Asegúrate de que tu sitio cargue rápidamente y sea completamente funcional en dispositivos móviles. Google prioriza los sitios que ofrecen una buena experiencia de usuario.
-                Utiliza herramientas como Google PageSpeed Insights para identificar áreas de mejora.
+            
+            <AccordionItem value="item-6">
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-foreground">
+                 <Monitor className="mr-3 h-5 w-5 text-primary/80" /> Velocidad de Carga y Experiencia Móvil (Core Web Vitals)
+              </AccordionTrigger>
+              <AccordionContent className="text-md text-muted-foreground leading-relaxed pt-2 pl-8">
+                Google prioriza los sitios que ofrecen una excelente experiencia de usuario.
+                <ul className="list-disc list-inside mt-2 space-y-1 pl-4">
+                  <li><strong>Core Web Vitals:</strong> Familiarízate con métricas como Largest Contentful Paint (LCP), First Input Delay (FID) - ahora Interaction to Next Paint (INP), y Cumulative Layout Shift (CLS). Usa PageSpeed Insights para medir y mejorar.</li>
+                  <li><strong>Diseño Responsivo (Mobile-First):</strong> Tu portafolio debe verse y funcionar perfectamente en todos los dispositivos, especialmente móviles. Google utiliza la indexación mobile-first.</li>
+                  <li><strong>Optimización del Código:</strong> Minimiza CSS y JavaScript, elimina código no utilizado, y optimiza el renderizado. Next.js ayuda mucho con esto, pero buenas prácticas de codificación son esenciales.</li>
+                </ul>
               </AccordionContent>
             </AccordionItem>
+
+            <AccordionItem value="item-7">
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-foreground">
+                <ExternalLink className="mr-3 h-5 w-5 text-primary/80" /> Enlaces Internos y Externos (Link Building Básico)
+              </AccordionTrigger>
+              <AccordionContent className="text-md text-muted-foreground leading-relaxed pt-2 pl-8">
+                Los enlaces ayudan a Google a descubrir tu contenido y a entender su importancia.
+                <ul className="list-disc list-inside mt-2 space-y-1 pl-4">
+                  <li><strong>Enlaces Internos:</strong> Enlaza de forma lógica entre tus proyectos, tu página "Sobre mí", y cualquier artículo de blog. Ayuda a distribuir la "autoridad de página" y a mejorar la navegación.</li>
+                  <li><strong>Enlaces Externos (Backlinks):</strong> Obtener enlaces de calidad desde otros sitios web hacia tu portafolio es muy valioso, aunque más difícil de controlar. Si colaboras en proyectos, participas en comunidades, o eres mencionado, intenta conseguir un enlace.</li>
+                  <li><strong>Enlaces Salientes:</strong> Enlazar a recursos relevantes y de autoridad también puede ser positivo, pero con moderación.</li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-8">
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-foreground">
+                <Settings2 className="mr-3 h-5 w-5 text-primary/80" /> Datos Estructurados (Schema Markup)
+              </AccordionTrigger>
+              <AccordionContent className="text-md text-muted-foreground leading-relaxed pt-2 pl-8">
+                Añade datos estructurados (usando JSON-LD es lo recomendado) para ayudar a los motores de búsqueda a entender mejor el contenido de tus páginas y mostrarlo de forma más atractiva en los resultados (rich snippets).
+                <ul className="list-disc list-inside mt-2 space-y-1 pl-4">
+                  <li><strong>Para tu perfil:</strong> Considera el schema <code className="font-mono text-sm bg-muted p-1 rounded">Person</code>.</li>
+                  <li><strong>Para tus proyectos:</strong> Puedes usar <code className="font-mono text-sm bg-muted p-1 rounded">SoftwareApplication</code>, <code className="font-mono text-sm bg-muted p-1 rounded">WebSite</code>, o <code className="font-mono text-sm bg-muted p-1 rounded">CreativeWork</code> dependiendo del tipo de proyecto.</li>
+                </ul>
+                Puedes generar estos fragmentos JSON-LD y añadirlos al <code className="font-mono text-sm bg-muted p-1 rounded">&lt;head&gt;</code> de tus páginas o directamente en el cuerpo del HTML. Next.js permite modificar el head dinámicamente.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-9">
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-foreground">
+                <BarChart3 className="mr-3 h-5 w-5 text-primary/80" /> Uso de Google Search Console
+              </AccordionTrigger>
+              <AccordionContent className="text-md text-muted-foreground leading-relaxed pt-2 pl-8">
+                Google Search Console (GSC) es una herramienta gratuita esencial.
+                <ul className="list-disc list-inside mt-2 space-y-1 pl-4">
+                  <li><strong>Verifica tu sitio:</strong> Añade y verifica tu portafolio en GSC.</li>
+                  <li><strong>Envía tu Sitemap:</strong> Ayuda a Google a descubrir todas tus páginas.</li>
+                  <li><strong>Monitoriza el Rendimiento:</strong> Ve qué consultas de búsqueda llevan tráfico a tu sitio, cómo se posicionan tus páginas, y los clics/impresiones que reciben.</li>
+                  <li><strong>Identifica Errores:</strong> GSC te alertará sobre problemas de rastreo, indexación, usabilidad móvil, etc.</li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-10">
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-foreground">
+                <ShieldCheck className="mr-3 h-5 w-5 text-primary/80" /> HTTPS y Seguridad del Sitio
+              </AccordionTrigger>
+              <AccordionContent className="text-md text-muted-foreground leading-relaxed pt-2 pl-8">
+                HTTPS no solo es crucial para la seguridad del usuario, sino que también es un factor de ranking para Google.
+                <ul className="list-disc list-inside mt-2 space-y-1 pl-4">
+                  <li>Asegúrate de que tu portafolio se sirva a través de HTTPS. Plataformas como Vercel y Netlify suelen configurar esto automáticamente.</li>
+                  <li>Considera cabeceras de seguridad como Content Security Policy (CSP) para mayor protección, aunque esto es más avanzado.</li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-11">
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-foreground">
+                <Info className="mr-3 h-5 w-5 text-primary/80" /> SEO Técnico Básico
+              </AccordionTrigger>
+              <AccordionContent className="text-md text-muted-foreground leading-relaxed pt-2 pl-8">
+                Más allá del contenido, algunos aspectos técnicos son importantes.
+                <ul className="list-disc list-inside mt-2 space-y-1 pl-4">
+                    <li><strong>Robots.txt:</strong> Un archivo <code className="font-mono text-sm bg-muted p-1 rounded">robots.txt</code> en la raíz de tu sitio puede indicar a los rastreadores qué partes de tu sitio deben o no deben rastrear. Para un portafolio, generalmente querrás que todo sea rastreable, pero es bueno saber que existe. Next.js puede generar uno básico.</li>
+                    <li><strong>Sitemap.xml:</strong> Como se mencionó, es una hoja de ruta de tu sitio para los motores de búsqueda. Asegúrate de que se genere y se envíe a Google Search Console.</li>
+                    <li><strong>Manejo de Redirecciones (301):</strong> Si cambias URLs de proyectos antiguos, usa redirecciones 301 para pasar la "autoridad" a la nueva URL y evitar errores 404.</li>
+                    <li><strong>Páginas 404 Personalizadas:</strong> Crea una página 404 amigable que ayude a los usuarios a volver a la navegación si llegan a una URL inexistente.</li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
           </Accordion>
         </CardContent>
       </Card>
     </div>
   );
 }
-
 
     
