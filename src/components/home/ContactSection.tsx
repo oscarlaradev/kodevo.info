@@ -1,14 +1,15 @@
+
 "use client";
 
 import { bioData } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mail, Linkedin, Github, Send } from 'lucide-react'; // Added Send icon
+import { Mail, Github, Send, Instagram } from 'lucide-react'; // Added Send and Instagram icons
 
 const platformIcons: { [key: string]: React.ElementType } = {
   Email: Mail,
-  LinkedIn: Linkedin,
   GitHub: Github,
+  Instagram: Instagram, // Added Instagram
 };
 
 export function ContactSection() {
@@ -28,7 +29,7 @@ export function ContactSection() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               {bioData.contact.map((item) => {
-                const Icon = platformIcons[item.platform] || Mail;
+                const Icon = platformIcons[item.platform] || Mail; // Default to Mail if no specific icon
                 return (
                   <Button
                     key={item.platform}

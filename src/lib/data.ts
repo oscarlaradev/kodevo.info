@@ -23,7 +23,7 @@ export interface BioData {
 }
 
 export const bioData: BioData = {
-  name: "Alex Bryant",
+  name: "Alex Bryant", // You might want to update this to Oscar Lara
   title: "Senior Full-Stack Developer",
   tagline: "Crafting elegant code, building performant applications.",
   about:
@@ -40,9 +40,9 @@ export const bioData: BioData = {
     { name: "Agile Methodologies" },
   ],
   contact: [
-    { platform: "GitHub", link: "https://github.com" },
-    { platform: "LinkedIn", link: "https://linkedin.com" },
-    { platform: "Email", link: "mailto:alex.bryant.dev@example.com" },
+    { platform: "GitHub", link: "https://github.com/oscarlaradev" },
+    { platform: "Instagram", link: "https://www.instagram.com/ossx_noxx" },
+    { platform: "Email", link: "mailto:oscarinlara87@gmail.com" },
   ],
 };
 
@@ -57,7 +57,7 @@ export const projectsData: Project[] = [
     previewUrl: "https://placehold.co/1200x800.png",
     projectUrl: "#",
     sourceCodeUrl: "#",
-    downloadUrl: "#", // Placeholder for actual download link
+    downloadUrl: "#", 
     technologies: ["Next.js", "TypeScript", "Python", "Flask", "AI/ML", "Vercel"],
     category: "Web App",
   },
@@ -71,7 +71,6 @@ export const projectsData: Project[] = [
     previewUrl: "https://placehold.co/1200x800.png",
     projectUrl: "#",
     sourceCodeUrl: "#",
-    // No downloadUrl for this project example
     technologies: ["React", "Three.js", "Node.js", "API Integration"],
     category: "Web App",
   },
@@ -85,7 +84,7 @@ export const projectsData: Project[] = [
     previewUrl: "https://placehold.co/1200x800.png",
     projectUrl: "#",
     sourceCodeUrl: "#",
-    downloadUrl: "#", // Placeholder
+    downloadUrl: "#",
     technologies: ["React", "Tailwind CSS", "Storybook", "Figma"],
     category: "UI Kit",
   },
@@ -98,11 +97,7 @@ export const projectsData: Project[] = [
     thumbnailUrl: "https://placehold.co/600x400.png",
     previewUrl: "https://placehold.co/1200x800.png",
     sourceCodeUrl: "#",
-    // No downloadUrl for this project example
     technologies: ["Electron", "React", "Cryptography", "SQLite"],
     category: "Desktop App",
   },
 ];
-
-// AI Hints are now primarily handled via data-ai-hint attributes in components.
-// The placeholder URLs are static now.
