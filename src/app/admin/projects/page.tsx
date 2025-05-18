@@ -16,7 +16,7 @@ export default function AdminProjectsPage() {
     <div className="container mx-auto py-8">
       <AdminPageHeader title="Gestionar Proyectos" description="Visualiza, añade, edita o elimina proyectos de tu portafolio.">
         <Button asChild>
-          <Link href="/admin/projects/new"> {/* Link to a future page */}
+          <Link href="/admin/projects/new">
             <PlusCircle className="mr-2 h-5 w-5" />
             Añadir Nuevo Proyecto
           </Link>
@@ -73,7 +73,7 @@ export default function AdminProjectsPage() {
         </CardContent>
       </Card>
        <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p>La página para añadir nuevos proyectos (`/admin/projects/new`) y la conexión a Firebase se implementarán en los próximos pasos.</p>
+          <p>La conexión a Firebase para guardar y mostrar proyectos dinámicamente se implementará en los próximos pasos.</p>
         </div>
     </div>
   );
