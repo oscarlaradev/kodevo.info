@@ -1,5 +1,5 @@
 // src/app/admin/seo/page.tsx
-"use client";
+"use client"; // Asegúrate de que esta directiva esté al principio
 
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
