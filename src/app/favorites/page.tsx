@@ -7,21 +7,27 @@ import { projectsData, type Project } from '@/lib/data';
 import { useFavorites } from '@/hooks/use-favorites';
 import { HeartPulse } from 'lucide-react'; // Using a slightly different Heart icon for page title
 
-export const metadata = {
-  title: 'My Favorite Projects - CodeCanvas',
-  description: 'A collection of your saved favorite projects from CodeCanvas.',
-};
+// Removed static metadata export as it's not allowed in Client Components
+// export const metadata = {
+//   title: 'My Favorite Projects - CodeCanvas',
+//   description: 'A collection of your saved favorite projects from CodeCanvas.',
+// };
 
 export default function FavoritesPage() {
   const { favorites, isMounted } = useFavorites();
   const [favoriteProjects, setFavoriteProjects] = useState<Project[]>([]);
 
   useEffect(() => {
+    // Dynamically set page title if needed
+    document.title = 'My Favorite Projects - CodeCanvas';
+  }, []);
+
+  useEffect(() => {
     if (isMounted) {
       const filteredProjects = projectsData.filter(project => favorites.includes(project.id));
       setFavoriteProjects(filteredProjects);
     }
-  }, [favorites, isMounted, projectsData]); // Added projectsData to dependencies
+  }, [favorites, isMounted]); // Removed projectsData from dependencies as it's stable
 
   if (!isMounted) {
     // Optional: show a loading state or null until client-side hydration
