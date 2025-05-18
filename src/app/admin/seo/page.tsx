@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Search, FileText, Lightbulb, Settings2, BarChart3, Loader2, AlertTriangle, Wand2, Smartphone, Monitor, ShieldCheck, ExternalLink } from "lucide-react";
+import { Switch } from '@/components/ui/switch'; // Added Switch
+import { ArrowLeft, Search, FileText, Lightbulb, Settings2, BarChart3, Loader2, AlertTriangle, Wand2, Smartphone, Monitor, ShieldCheck, ExternalLink, KeyRound, Copy } from "lucide-react"; // Added KeyRound, Copy
 import { Separator } from '@/components/ui/separator';
 import {
   Accordion,
@@ -25,12 +26,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { generateSeoContentIdeas, type SeoContentIdeasInput } from '@/ai/flows/generate-seo-ideas-flow';
 import { generateMetaTags, type MetaTagsInput } from '@/ai/flows/generate-meta-tags-flow';
 import { generateRelatedKeywords, type RelatedKeywordsInput } from '@/ai/flows/generate-related-keywords-flow';
 import { analyzePageSpeed, type PageSpeedInputClient, type PageSpeedOutput } from '@/services/pageSpeedService';
-import { getMozUrlMetrics, type MozUrlMetricsInput, type MozUrlMetricsOutput } from '@/services/mozService'; // Import Moz service
+import { getMozUrlMetrics, type MozUrlMetricsInput, type MozUrlMetricsOutput } from '@/services/mozService';
+import { generateRandomPassword, type PasswordGeneratorInput, type PasswordGeneratorOutput } from '@/services/randomPasswordGeneratorService'; // Added
 import { useToast } from '@/hooks/use-toast';
 
 export default function SeoToolsPage() {
@@ -67,6 +69,16 @@ export default function SeoToolsPage() {
   const [mozResults, setMozResults] = useState<MozUrlMetricsOutput | null>(null);
   const [isFetchingMozMetrics, setIsFetchingMozMetrics] = useState(false);
   const [mozError, setMozError] = useState<string | null>(null);
+
+  // State for Random Password Generator
+  const [passwordLength, setPasswordLength] = useState<number>(16);
+  const [includeUppercase, setIncludeUppercase] = useState(true);
+  const [includeLowercase, setIncludeLowercase] = useState(true);
+  const [includeNumbers, setIncludeNumbers] = useState(true);
+  const [includeSymbols, setIncludeSymbols] = useState(true);
+  const [generatedPassword, setGeneratedPassword] = useState<string>('');
+  const [isGeneratingPassword, setIsGeneratingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
 
   const handleGenerateIdeas = async () => {
@@ -232,6 +244,61 @@ export default function SeoToolsPage() {
       setIsFetchingMozMetrics(false);
     }
   };
+
+  const handleGeneratePassword = async () => {
+    if (passwordLength < 8 || passwordLength > 128) {
+      setPasswordError("La longitud de la contraseña debe estar entre 8 y 128.");
+      return;
+    }
+    if (!includeUppercase && !includeLowercase && !includeNumbers && !includeSymbols) {
+      setPasswordError("Debes incluir al menos un tipo de caracter.");
+      return;
+    }
+
+    setIsGeneratingPassword(true);
+    setGeneratedPassword('');
+    setPasswordError(null);
+    try {
+      const input: PasswordGeneratorInput = {
+        passwordLength,
+        uppercase: includeUppercase,
+        lowercase: includeLowercase,
+        numbers: includeNumbers,
+        symbols: includeSymbols,
+      };
+      const result = await generateRandomPassword(input);
+      setGeneratedPassword(result.randomPassword);
+      toast({
+        title: "Contraseña Generada",
+        description: "Se ha generado una nueva contraseña aleatoria.",
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+      console.error("Error generating password:", errorMessage);
+      setPasswordError(`Error: ${errorMessage}`);
+      toast({
+        title: "Error al Generar Contraseña",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingPassword(false);
+    }
+  };
+
+  const handleCopyPassword = () => {
+    if (generatedPassword) {
+      navigator.clipboard.writeText(generatedPassword)
+        .then(() => {
+          toast({ title: "Contraseña Copiada", description: "La contraseña generada ha sido copiada al portapapeles." });
+        })
+        .catch(err => {
+          console.error('Failed to copy password: ', err);
+          toast({ title: "Error al Copiar", description: "No se pudo copiar la contraseña.", variant: "destructive" });
+        });
+    }
+  };
+
 
   const getScoreColor = (score: number, higherIsBetter = true): string => {
     if (higherIsBetter) {
@@ -557,20 +624,92 @@ export default function SeoToolsPage() {
           )}
         </Card>
 
-        {/* Tool 6: Internal Link Analyzer (Placeholder) */}
-        <Card className="shadow-lg rounded-lg opacity-70 bg-muted/30">
+        {/* Tool 6: Random Password Generator (RapidAPI) */}
+        <Card className="shadow-lg rounded-lg">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
-                <BarChart3 className="h-7 w-7 text-primary/70" /> {/* Using BarChart3 for consistency with other analytic-like tools */}
-                <CardTitle className="text-lg font-semibold">Análisis de Enlaces Internos</CardTitle>
+                <KeyRound className="h-7 w-7 text-primary" />
+                <CardTitle className="text-lg font-semibold">Generador de Contraseñas</CardTitle>
             </div>
-            <CardDescription className="text-sm min-h-[3.5rem]">Analiza la estructura de enlaces internos de tu sitio. (Próximamente)</CardDescription>
+            <CardDescription className="text-sm min-h-[3.5rem]">Crea contraseñas seguras y aleatorias con RapidAPI.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground mb-3">
-              Esta herramienta (próximamente) te ayudará a entender cómo fluye el "link equity" a través de tu sitio.
-            </p>
-             <Button className="mt-4 w-full" disabled>Iniciar Análisis de Enlaces</Button>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="password-length">Longitud de Contraseña ({passwordLength})</Label>
+                <Input 
+                  id="password-length" 
+                  type="number"
+                  value={passwordLength}
+                  onChange={(e) => setPasswordLength(parseInt(e.target.value, 10) || 8)}
+                  min={8}
+                  max={128}
+                  disabled={isGeneratingPassword}
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="include-uppercase" className="text-sm font-medium">Incluir Mayúsculas</Label>
+                <Switch 
+                  id="include-uppercase" 
+                  checked={includeUppercase} 
+                  onCheckedChange={setIncludeUppercase}
+                  disabled={isGeneratingPassword}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="include-lowercase" className="text-sm font-medium">Incluir Minúsculas</Label>
+                <Switch 
+                  id="include-lowercase" 
+                  checked={includeLowercase} 
+                  onCheckedChange={setIncludeLowercase}
+                  disabled={isGeneratingPassword}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="include-numbers" className="text-sm font-medium">Incluir Números</Label>
+                <Switch 
+                  id="include-numbers" 
+                  checked={includeNumbers} 
+                  onCheckedChange={setIncludeNumbers}
+                  disabled={isGeneratingPassword}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="include-symbols" className="text-sm font-medium">Incluir Símbolos</Label>
+                <Switch 
+                  id="include-symbols" 
+                  checked={includeSymbols} 
+                  onCheckedChange={setIncludeSymbols}
+                  disabled={isGeneratingPassword}
+                />
+              </div>
+            </div>
+            <Button 
+              className="mt-6 w-full" 
+              onClick={handleGeneratePassword}
+              disabled={isGeneratingPassword}
+            >
+              {isGeneratingPassword ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+              {isGeneratingPassword ? 'Generando...' : 'Generar Contraseña'}
+            </Button>
+            {passwordError && (
+              <div className="mt-3 text-sm text-destructive bg-destructive/10 p-3 rounded-md flex items-center">
+                <AlertTriangle className="h-4 w-4 mr-2 shrink-0" />
+                {passwordError}
+              </div>
+            )}
+            {generatedPassword && (
+              <div className="mt-4 space-y-2 pt-3 border-t">
+                <Label className="font-semibold text-foreground">Contraseña Generada:</Label>
+                <div className="flex items-center gap-2">
+                  <Input value={generatedPassword} readOnly className="bg-muted/50 flex-grow" />
+                  <Button variant="ghost" size="icon" onClick={handleCopyPassword} title="Copiar contraseña">
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -633,3 +772,6 @@ export default function SeoToolsPage() {
     </div>
   );
 }
+
+
+    
