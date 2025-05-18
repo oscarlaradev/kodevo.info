@@ -99,20 +99,5 @@ export const projectsData: Project[] = [
   },
 ];
 
-// Add data-ai-hint to placeholder URLs in actual implementation
-projectsData.forEach(p => {
-  if (p.thumbnailUrl.includes('placehold.co')) {
-    p.thumbnailUrl = `${p.thumbnailUrl}?${new Date().getTime()}`; // Ensure uniqueness for placeholder
-  }
-  if (p.previewUrl.includes('placehold.co')) {
-    p.previewUrl = `${p.previewUrl}?${new Date().getTime()}`; // Ensure uniqueness for placeholder
-  }
-});
-bioData.profilePictureUrl = `${bioData.profilePictureUrl}?${new Date().getTime()}`;
-
-// AI Hints (conceptual, add these as data-ai-hint attributes in components)
-// EcoSort AI thumbnail: "recycling technology"
-// Stellar Journey Planner thumbnail: "galaxy stars"
-// DevPortfolio UI Kit thumbnail: "web design code"
-// Quantum Notes thumbnail: "secure notes"
-// Bio profile picture: "programmer portrait"
+// AI Hints are now primarily handled via data-ai-hint attributes in components.
+// The placeholder URLs are static now.
