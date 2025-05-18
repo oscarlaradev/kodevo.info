@@ -55,7 +55,7 @@ export const projectsData: Project[] = [
       "EcoSort AI is an innovative web application designed to help users correctly sort their waste using artificial intelligence. Upload an image of an item, and the AI identifies it, providing detailed sorting instructions. Built with Next.js for a fast frontend, Python/Flask for the AI backend, and deployed on Vercel.",
     thumbnailUrl: "https://placehold.co/600x400.png",
     previewUrl: "https://placehold.co/1200x800.png",
-    projectUrl: "#",
+    projectUrl: "https://example.com", // Actualizado para demostración
     sourceCodeUrl: "#",
     downloadUrl: "#", 
     technologies: ["Next.js", "TypeScript", "Python", "Flask", "AI/ML", "Vercel"],
@@ -96,7 +96,9 @@ export const projectsData: Project[] = [
       "Quantum Notes offers a privacy-focused note-taking experience with robust end-to-end encryption. Features include markdown support, tagging, and cross-device sync. Built using Electron, React, and a custom encryption library.",
     thumbnailUrl: "https://placehold.co/600x400.png",
     previewUrl: "https://placehold.co/1200x800.png",
+    projectUrl: "#", // Mantener '#' si no hay demo real
     sourceCodeUrl: "#",
+    downloadUrl: "#", // Mantener '#' si no hay descarga
     technologies: ["Electron", "React", "Cryptography", "SQLite"],
     category: "Desktop App",
   },
