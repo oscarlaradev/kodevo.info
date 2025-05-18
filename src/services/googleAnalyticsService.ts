@@ -45,9 +45,9 @@ export async function getPageViewReport(): Promise<GaReportOutput> {
   });
 
   const today = new Date();
-  const sevenDaysAgo = subDays(today, 7);
+  const sevenDaysAgo = subDays(today, 7); // Data for the last 7 full days.
   const formattedStartDate = format(sevenDaysAgo, 'yyyy-MM-dd');
-  const formattedEndDate = format(today, 'yyyy-MM-dd');
+  const formattedEndDate = format(subDays(today,1), 'yyyy-MM-dd'); // GA data is usually available up to 'yesterday'. 'today' might be incomplete.
 
   try {
     console.log(`[GA Service] Fetching report for property ID: ${propertyId} from ${formattedStartDate} to ${formattedEndDate}`);
@@ -69,12 +69,12 @@ export async function getPageViewReport(): Promise<GaReportOutput> {
           name: 'screenPageViews',
         },
       ],
-      orderBys: [ // Optional: order by date
+      orderBys: [ 
         {
           dimension: {
             dimensionName: 'date',
           },
-          // desc: false, // true for descending, false for ascending
+          // desc: false, // default is ascending
         }
       ]
     });
@@ -85,8 +85,7 @@ export async function getPageViewReport(): Promise<GaReportOutput> {
     response.rows?.forEach(row => {
       if (row.dimensionValues && row.metricValues) {
         const dateString = row.dimensionValues[0].value || 'unknown-date';
-        // GA date format is YYYYMMDD, convert to YYYY-MM-DD if needed, or ensure chart can handle it
-        // For this example, assuming we want YYYY-MM-DD format for the chart later
+        // GA date format is YYYYMMDD, convert to YYYY-MM-DD
         const formattedApiDate = `${dateString.substring(0,4)}-${dateString.substring(4,6)}-${dateString.substring(6,8)}`;
         
         reportData.push({
@@ -96,9 +95,12 @@ export async function getPageViewReport(): Promise<GaReportOutput> {
       }
     });
 
-    // Sort data by date ascending, as GA API might not always return it sorted depending on query.
-    reportData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    // Data from API is already ordered by date due to orderBys
+    // reportData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+    if (response.rows?.length === 0) {
+      console.log('[GA Service] Successfully fetched report from GA API, but it contained 0 rows of data for the specified period.');
+    }
     console.log(`[GA Service] Processed ${reportData.length} data points.`);
     return { 
       data: reportData, 
