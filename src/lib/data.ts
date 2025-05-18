@@ -24,21 +24,30 @@ export interface BioData {
 }
 
 export const bioData: BioData = {
-  name: "Oscar Lara", // Name likely kept as is
-  title: "Desarrollador Full-Stack Senior",
+  name: "Oscar Lara",
+  title: "Desarrollador Full-Stack Junior",
   tagline: "Creando código elegante, construyendo aplicaciones de alto rendimiento.",
   about:
-    "Con más de una década de experiencia en la industria tecnológica, me especializo en crear soluciones web innovadoras y eficientes. Mi pasión radica en convertir problemas complejos en diseños simples, hermosos e intuitivos. Prospero en entornos colaborativos y siempre estoy ansioso por aprender nuevas tecnologías y metodologías para ampliar los límites de lo posible.",
-  profilePictureUrl: "https://placehold.co/400x400.png", // Assuming this placeholder URL is fine
-  skills: [ // Skill names are often kept in English or using common industry terms
-    { name: "React & Next.js" },
-    { name: "Node.js & Express" },
-    { name: "TypeScript" },
-    { name: "GraphQL & REST APIs" },
-    { name: "Diseño de Bases de Datos (SQL & NoSQL)" },
-    { name: "Plataformas Cloud (AWS, Firebase)" },
-    { name: "Principios UI/UX" },
-    { name: "Metodologías Ágiles" },
+    "Soy un desarrollador Full-Stack en crecimiento con experiencia en la creación de soluciones web funcionales y eficientes. Me apasiona transformar problemas complejos en interfaces intuitivas y atractivas. Disfruto trabajar en entornos colaborativos y siempre estoy explorando nuevas tecnologías y metodologías para mejorar mis habilidades y ampliar los límites de lo posible.",
+  profilePictureUrl: "/profile.jpg",
+  skills: [
+    { name: "HTML" },
+    { name: "CSS" },
+    { name: "JavaScript" },
+    { name: "PHP y MySQL" },
+    { name: "Figma" },
+    { name: "Firebase" },
+    { name: "GitHub" },
+    { name: "Bootstrap" },
+    { name: "APIs" },
+    { name: "Cloud Computing" }, // "Cloud" is a bit generic, so I'll use "Cloud Computing"
+    { name: "Diseño UI" },       // Separating UI and UX
+    { name: "Diseño UX" },
+    { name: "React" },
+    { name: "Next.js" },
+    { name: "Node.js" },
+    { name: ".NET" },
+    { name: "Astro" },
   ],
   contact: [
     { platform: "GitHub", link: "https://github.com/oscarlaradev" },
