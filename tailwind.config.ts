@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-import defaultTheme from 'tailwindcss/defaultTheme'; // Import Tailwind's default theme
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 export default {
     darkMode: ["class"],
@@ -10,8 +10,8 @@ export default {
   ],
   theme: {
   	extend: {
-      fontFamily: { // Add fontFamily configuration
-        sans: ['var(--font-geist-sans)', ...defaultTheme.fontFamily.sans], // Use GeistSans CSS variable
+      fontFamily: {
+        sans: ['var(--font-inter)', ...defaultTheme.fontFamily.sans], // Use Inter CSS variable
       },
   		colors: {
   			background: 'hsl(var(--background))',
