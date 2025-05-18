@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google'; // Import Inter from next/font/google
+import { Roboto_Flex } from 'next/font/google'; // Cambiado de Inter a Roboto_Flex
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Toaster } from '@/components/ui/toaster';
 import { Providers } from './providers';
 
-// Initialize Inter font with subsets and a CSS variable
-const inter = Inter({ 
+// Inicializar Roboto_Flex con subconjuntos y una variable CSS
+const roboto_flex = Roboto_Flex({ 
   subsets: ['latin'],
-  variable: '--font-inter', // Define a CSS variable for the font
+  variable: '--font-roboto-flex', // Definir una variable CSS para la fuente
 });
 
 export const metadata: Metadata = {
@@ -24,10 +24,10 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       {/* 
-        Apply the Inter font's CSS variable class to the body.
-        The 'font-sans' Tailwind utility class will then use this CSS variable.
+        Aplicar la clase de variable CSS de Roboto_Flex al body.
+        La utilidad 'font-sans' de Tailwind usará esta variable.
       */}
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${roboto_flex.variable} font-sans antialiased`}>
         <Providers>
           <Header />
           <main className="pt-20 md:pt-24 min-h-[calc(100vh-5rem)] overflow-x-hidden">

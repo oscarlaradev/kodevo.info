@@ -11,7 +11,7 @@ export default {
   theme: {
   	extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', ...defaultTheme.fontFamily.sans], // Use Inter CSS variable
+        sans: ['var(--font-roboto-flex)', ...defaultTheme.fontFamily.sans], // Usar la variable de Roboto Flex
       },
   		colors: {
   			background: 'hsl(var(--background))',
