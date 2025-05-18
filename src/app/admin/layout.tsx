@@ -1,13 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import '@/app/globals.css'; // Reuse global styles
-import { Toaster } from '@/components/ui/toaster';
-import { Providers } from '@/app/providers'; // If you have global providers
-
-const inter = Inter({ 
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
+import '@/app/globals.css'; // Make sure Tailwind processes classes used in admin pages
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard - CodeCanvas',
@@ -19,19 +11,17 @@ export default function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // This component's output will be slotted into the {children} of RootLayout.
+  // RootLayout already provides <html>, <body>, main site Header, Toaster, Providers, and a <main> tag.
+  // AdminLayout should only provide the specific structure/styling for the admin section itself,
+  // which will be nested within RootLayout's <main>.
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased bg-muted/40`}>
-        <Providers>
-          <div className="flex flex-col min-h-screen">
-            {/* We might add a specific Admin Sidebar/Header here later */}
-            <main className="flex-grow p-4 md:p-8">
-              {children}
-            </main>
-          </div>
-          <Toaster />
-        </Providers>
-      </body>
-    </html>
+    <div className="bg-muted/40">
+      {/* Individual admin pages (e.g., /admin/page.tsx, /admin/projects/page.tsx) 
+          are responsible for their own internal layout like containers and padding.
+          If a persistent Admin Sidebar or Header were needed, it would go here,
+          inside this div and wrapping or alongside {children}. */}
+      {children}
+    </div>
   );
 }
