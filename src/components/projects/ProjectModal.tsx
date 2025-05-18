@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Heart, ExternalLink, Github, Download } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useId } from 'react'; // Import useId
+import { useId } from 'react';
 
 interface ProjectModalProps {
   project: Project;
@@ -32,20 +32,18 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent 
+      <DialogContent
         className="sm:max-w-3xl md:max-w-4xl lg:max-w-5xl max-h-[90vh] p-0 rounded-xl shadow-2xl bg-card flex flex-col"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
       >
-        <DialogHeader className="p-6 pb-0 flex-row justify-between items-start">
-          <div>
-            <DialogTitle id={titleId} className="text-3xl font-bold text-primary">{project.title}</DialogTitle>
-            <DialogDescription id={descriptionId} className="text-muted-foreground mt-1">{project.category}</DialogDescription>
-          </div>
+        <DialogHeader className="p-6 pb-4 text-left"> {/* Adjusted padding and ensured text-left */}
+          <DialogTitle id={titleId} className="text-3xl font-bold text-primary">{project.title}</DialogTitle>
+          <DialogDescription id={descriptionId} className="text-muted-foreground mt-1">{project.category}</DialogDescription>
         </DialogHeader>
-        
+
         <ScrollArea className="flex-grow overflow-y-auto">
-          <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
+          <div className="p-6 pt-0 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start"> {/* Adjusted pt-0 as pb-4 is on header */}
             {/* Left Side: Preview Image */}
             <div className="rounded-lg overflow-hidden shadow-lg aspect-video relative">
               <Image
@@ -86,7 +84,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                 </a>
               </Button>
             )}
-            {project.sourceCodeUrl && ( 
+            {project.sourceCodeUrl && (
               <Button variant="outline" asChild className="rounded-lg shadow-sm hover:shadow-md">
                 <a href={project.sourceCodeUrl} target="_blank" rel="noopener noreferrer">
                   <Github className="mr-2 h-4 w-4" /> Source Code
