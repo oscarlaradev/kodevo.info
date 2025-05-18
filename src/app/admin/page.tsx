@@ -57,24 +57,6 @@ export default function AdminDashboardPage() {
           </Card>
         ))}
       </div>
-
-       <Card className="shadow-lg rounded-lg">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold flex items-center">
-            <ListChecks className="mr-2 h-6 w-6 text-primary" />
-            Próximos Pasos y Consideraciones
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-            <li><strong>Conectar Analíticas:</strong> Integrar datos reales para los gráficos (ej. Firebase Analytics o seguimiento personalizado en Firestore).</li>
-            <li><strong>Desarrollar Herramientas SEO:</strong> Implementar funcionalidades básicas de SEO en la página dedicada.</li>
-            <li><strong>Subida de Archivos:</strong> Finalizar la implementación de subida de archivos a Firebase Storage para imágenes y descargas de proyectos.</li>
-            <li><strong>Seguridad Avanzada:</strong> Implementar roles de usuario si es necesario y refinar reglas de seguridad de Firebase.</li>
-            <li><strong>Personalización:</strong> Añadir opciones para personalizar la apariencia del portafolio desde el admin panel.</li>
-          </ul>
-        </CardContent>
-      </Card>
     </div>
   );
 }
