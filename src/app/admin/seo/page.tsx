@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Search, FileText, Lightbulb, Link2, Settings2, BarChart3, Loader2, AlertTriangle, Wand2, Smartphone, Monitor } from "lucide-react";
+import { ArrowLeft, Search, FileText, Lightbulb, Settings2, BarChart3, Loader2, AlertTriangle, Wand2, Smartphone, Monitor, ShieldCheck, ExternalLink } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import {
   Accordion,
@@ -24,11 +24,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useState } from 'react';
 import { generateSeoContentIdeas, type SeoContentIdeasInput } from '@/ai/flows/generate-seo-ideas-flow';
 import { generateMetaTags, type MetaTagsInput } from '@/ai/flows/generate-meta-tags-flow';
 import { generateRelatedKeywords, type RelatedKeywordsInput } from '@/ai/flows/generate-related-keywords-flow';
 import { analyzePageSpeed, type PageSpeedInputClient, type PageSpeedOutput } from '@/services/pageSpeedService';
+import { getMozUrlMetrics, type MozUrlMetricsInput, type MozUrlMetricsOutput } from '@/services/mozService'; // Import Moz service
 import { useToast } from '@/hooks/use-toast';
 
 export default function SeoToolsPage() {
@@ -59,6 +61,12 @@ export default function SeoToolsPage() {
   const [pageSpeedResults, setPageSpeedResults] = useState<PageSpeedOutput | null>(null);
   const [isAnalyzingPageSpeed, setIsAnalyzingPageSpeed] = useState(false);
   const [pageSpeedError, setPageSpeedError] = useState<string | null>(null);
+
+  // State for Moz URL Metrics
+  const [mozUrl, setMozUrl] = useState('');
+  const [mozResults, setMozResults] = useState<MozUrlMetricsOutput | null>(null);
+  const [isFetchingMozMetrics, setIsFetchingMozMetrics] = useState(false);
+  const [mozError, setMozError] = useState<string | null>(null);
 
 
   const handleGenerateIdeas = async () => {
@@ -195,7 +203,49 @@ export default function SeoToolsPage() {
     }
   };
 
-  const getScoreColor = (score: number): string => {
+  const handleFetchMozMetrics = async () => {
+    if (!mozUrl.trim()) {
+      setMozError("Por favor, introduce una URL para analizar.");
+      return;
+    }
+    setIsFetchingMozMetrics(true);
+    setMozResults(null);
+    setMozError(null);
+    try {
+      const input: MozUrlMetricsInput = { url: mozUrl };
+      const result = await getMozUrlMetrics(input);
+      setMozResults(result);
+      toast({
+        title: "Métricas de Moz Obtenidas",
+        description: `DA/PA para ${result.url}`,
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+      console.error("Error fetching Moz metrics:", errorMessage);
+      setMozError(`Error: ${errorMessage}`);
+      toast({
+        title: "Error al Obtener Métricas de Moz",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsFetchingMozMetrics(false);
+    }
+  };
+
+  const getScoreColor = (score: number, higherIsBetter = true): string => {
+    if (higherIsBetter) {
+        if (score >= 70) return 'bg-green-500 text-white';
+        if (score >= 40) return 'bg-yellow-500 text-black';
+        return 'bg-red-500 text-white';
+    } else { // Lower is better (e.g. CLS)
+        if (score <= 0.1) return 'bg-green-500 text-white';
+        if (score <= 0.25) return 'bg-yellow-500 text-black';
+        return 'bg-red-500 text-white';
+    }
+  };
+
+  const getPageSpeedScoreColor = (score: number): string => {
     if (score >= 90) return 'bg-green-500 text-white';
     if (score >= 50) return 'bg-yellow-500 text-black';
     return 'bg-red-500 text-white';
@@ -321,7 +371,7 @@ export default function SeoToolsPage() {
               <h4 className="font-semibold text-foreground">Resultados ({pageSpeedResults.strategy}):</h4>
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm w-full">
                 <div className="font-medium">Puntuación Rendimiento:</div>
-                <div className={`font-bold px-2 py-0.5 rounded text-center text-xs ${getScoreColor(pageSpeedResults.performanceScore)}`}>
+                <div className={`font-bold px-2 py-0.5 rounded text-center text-xs ${getPageSpeedScoreColor(pageSpeedResults.performanceScore)}`}>
                     {pageSpeedResults.performanceScore} / 100
                 </div>
                 
@@ -448,36 +498,77 @@ export default function SeoToolsPage() {
           </CardContent>
         </Card>
 
-        {/* Tool 5: Sitemap Status (Placeholder) */}
-        <Card className="shadow-lg rounded-lg opacity-70 bg-muted/30">
+        {/* Tool 5: Moz URL Metrics */}
+        <Card className="shadow-lg rounded-lg">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
-              <Link2 className="h-7 w-7 text-primary/70" />
-              <CardTitle className="text-lg font-semibold">Sitemap</CardTitle>
+              <ShieldCheck className="h-7 w-7 text-primary" />
+              <CardTitle className="text-lg font-semibold">Métricas de URL Moz (DA/PA)</CardTitle>
             </div>
-            <CardDescription className="text-sm min-h-[3.5rem]">Gestiona y verifica el sitemap de tu sitio. (Próximamente)</CardDescription>
+            <CardDescription className="text-sm min-h-[3.5rem]">Consulta la Autoridad de Dominio (DA), Autoridad de Página (PA) y dominios raíz enlazantes.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground mb-2">
-              Un sitemap ayuda a los motores de búsqueda a descubrir tu contenido. Next.js puede generar sitemaps dinámicamente.
-            </p>
-            <Button variant="outline" className="w-full" disabled>Verificar Sitemap (sitemap.xml)</Button>
-             <Button className="mt-2 w-full" disabled>Generar/Actualizar Sitemap</Button>
+            <div className="space-y-2">
+              <Label htmlFor="moz-url-input">URL a Analizar</Label>
+              <Input 
+                id="moz-url-input" 
+                placeholder="Ej: https://tu-sitio.com/pagina" 
+                value={mozUrl}
+                onChange={(e) => setMozUrl(e.target.value)}
+                disabled={isFetchingMozMetrics}
+              />
+            </div>
+            <Button 
+              className="mt-4 w-full" 
+              onClick={handleFetchMozMetrics}
+              disabled={isFetchingMozMetrics || !mozUrl.trim()}
+            >
+              {isFetchingMozMetrics ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}
+              {isFetchingMozMetrics ? 'Obteniendo...' : 'Obtener Métricas de Moz'}
+            </Button>
+            {mozError && (
+              <div className="mt-3 text-sm text-destructive bg-destructive/10 p-3 rounded-md flex items-center">
+                <AlertTriangle className="h-4 w-4 mr-2 shrink-0" />
+                {mozError}
+              </div>
+            )}
           </CardContent>
+          {mozResults && (
+            <CardFooter className="flex-col items-start gap-2 pt-4 border-t">
+              <h4 className="font-semibold text-foreground">Resultados para: <a href={mozResults.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">{mozResults.url}</a></h4>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm w-full">
+                <div className="font-medium">Autoridad de Dominio:</div>
+                <div className={`font-bold px-2 py-0.5 rounded text-center text-xs ${getScoreColor(mozResults.domainAuthority || 0)}`}>
+                  {mozResults.domainAuthority !== undefined ? mozResults.domainAuthority.toFixed(2) : 'N/A'}
+                </div>
+                
+                <div className="font-medium">Autoridad de Página:</div>
+                 <div className={`font-bold px-2 py-0.5 rounded text-center text-xs ${getScoreColor(mozResults.pageAuthority || 0)}`}>
+                  {mozResults.pageAuthority !== undefined ? mozResults.pageAuthority.toFixed(2) : 'N/A'}
+                </div>
+
+                <div className="font-medium">Dominios Raíz Enlazantes:</div>
+                <div>{mozResults.linkingRootDomains !== undefined ? mozResults.linkingRootDomains.toLocaleString() : 'N/A'}</div>
+              </div>
+               <p className="text-xs text-muted-foreground mt-2">
+                Métricas proporcionadas por <a href="https://moz.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">Moz API</a>.
+               </p>
+            </CardFooter>
+          )}
         </Card>
 
         {/* Tool 6: Internal Link Analyzer (Placeholder) */}
         <Card className="shadow-lg rounded-lg opacity-70 bg-muted/30">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
-                <BarChart3 className="h-7 w-7 text-primary/70" />
+                <BarChart3 className="h-7 w-7 text-primary/70" /> {/* Using BarChart3 for consistency with other analytic-like tools */}
                 <CardTitle className="text-lg font-semibold">Análisis de Enlaces Internos</CardTitle>
             </div>
             <CardDescription className="text-sm min-h-[3.5rem]">Analiza la estructura de enlaces internos de tu sitio. (Próximamente)</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-3">
-              Esta herramienta (próximamente) te ayudará a entender cómo fluye el "link equity".
+              Esta herramienta (próximamente) te ayudará a entender cómo fluye el "link equity" a través de tu sitio.
             </p>
              <Button className="mt-4 w-full" disabled>Iniciar Análisis de Enlaces</Button>
           </CardContent>
