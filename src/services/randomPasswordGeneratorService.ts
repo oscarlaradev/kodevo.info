@@ -37,22 +37,24 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
   const apiHost = process.env.RAPIDAPI_HOST_PASSWORD_GENERATOR;
 
   if (!apiKey || !apiHost) {
-    console.error('RapidAPI Key o Host para el generador de contraseñas no están configurados en las variables de entorno.');
+    console.error('[Password Generator Service] RapidAPI Key o Host para el generador de contraseñas no están configurados en las variables de entorno.');
     throw new Error('Configuración del servidor incompleta para el generador de contraseñas.');
   }
 
   const queryParams = new URLSearchParams();
+  // Ensure 'length' is used as the parameter name as per RapidAPI typical usage
   queryParams.append('length', passwordLength.toString());
-  if (uppercase) queryParams.append('uppercase', 'on');
+  if (uppercase) queryParams.append('uppercase', 'on'); // Common practice is 'on' or 'true'
   if (lowercase) queryParams.append('lowercase', 'on');
   if (numbers) queryParams.append('numbers', 'on');
   if (symbols) queryParams.append('symbols', 'on');
   
+  // Corrected endpoint path based on user provided info
   const endpointPath = "/random-password/index.php"; 
   const endpointUrl = `https://${apiHost}${endpointPath}?${queryParams.toString()}`;
   
   try {
-    console.log(`[Password Generator Service] Fetching URL: ${endpointUrl.replace(apiKey, 'YOUR_RAPIDAPI_KEY')}`);
+    console.log(`[Password Generator Service] Fetching URL: ${endpointUrl.replace(apiKey, 'YOUR_RAPIDAPI_KEY')}`); // Log URL (key redacted for safety)
     const response = await fetch(endpointUrl, {
       method: 'GET',
       headers: {
@@ -62,6 +64,9 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
     });
 
     const responseText = await response.text();
+    // Log the raw response text from the API
+    console.log("[Password Generator Service] Raw responseText from API:", responseText);
+
 
     if (!response.ok) {
       let errorData;
@@ -74,34 +79,40 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
         }
         throw new Error(`Error de la API de RapidAPI: ${response.status} ${response.statusText}. Respuesta no válida del servidor.`);
       }
-      console.error("[Password Generator Service] API Error Response:", errorData);
-      const apiErrorMessage = errorData?.message || errorData?.error || 'Mensaje de error no disponible de RapidAPI.';
+      console.error("[Password Generator Service] API Error Response (parsed):", errorData);
+      const apiErrorMessage = errorData?.message || errorData?.error || responseText || 'Mensaje de error no disponible de RapidAPI.';
       throw new Error(`Error de la API de RapidAPI: ${response.status} ${response.statusText}. ${apiErrorMessage}`);
     }
     
     let passwordString = '';
     try {
-        // Esta API en particular a menudo devuelve la contraseña directamente como texto.
-        // Si JSON.parse falla, asumimos que responseText es la contraseña.
+        // This API often returns the password directly as text.
+        // If JSON.parse fails, assume responseText is the password.
         const jsonData = JSON.parse(responseText);
-        if (jsonData.random_password) {
+        console.log("[Password Generator Service] Parsed jsonData from API:", jsonData);
+
+        if (jsonData && jsonData.random_password) {
             passwordString = jsonData.random_password;
-        } else if (jsonData.password) {
+        } else if (jsonData && jsonData.password) {
             passwordString = jsonData.password;
         } else if (typeof jsonData === 'string') { 
              passwordString = jsonData;
         } else {
-            // Intenta encontrar cualquier propiedad de cadena si es un objeto JSON inesperado
+            // Try to find any string property if it's an unexpected JSON object
             const firstStringProp = Object.values(jsonData).find(val => typeof val === 'string');
             if (firstStringProp) {
                 passwordString = firstStringProp as string;
             } else {
-                console.error("[Password Generator Service] Password not found in JSON response, or response not a direct string:", jsonData);
-                throw new Error('La contraseña no se encontró en la respuesta de la API o el formato es inesperado.');
+                // If we successfully parsed JSON but couldn't find a known password field or any string,
+                // it's possible the plain responseText was the intended password.
+                // This case might be redundant if the API truly returns plain text, caught by outer catch.
+                console.warn("[Password Generator Service] Password not found in known JSON fields, trying responseText as fallback.");
+                passwordString = responseText.trim(); // Fallback to trimmed responseText
             }
         }
     } catch (e) {
-        // Si JSON.parse falla, es probable que responseText sea la contraseña directamente (texto plano)
+        // If JSON.parse fails, it's likely responseText is the password directly (plain text)
+        console.log("[Password Generator Service] JSON.parse failed, assuming responseText is the password. Error:", (e as Error).message);
         if (typeof responseText === 'string' && responseText.trim().length > 0) {
             passwordString = responseText.trim();
         } else {
@@ -110,22 +121,22 @@ export async function generateRandomPassword(input: PasswordGeneratorInput): Pro
         }
     }
     
-    if (!passwordString) {
-      console.error("[Password Generator Service] Extracted password string is empty.");
-      throw new Error('La API devolvió una contraseña vacía.');
+    // Log the derived password string before returning
+    console.log("[Password Generator Service] Derived passwordString:", `"${passwordString}"`);
+
+    if (!passwordString || passwordString.trim() === '') {
+      console.error("[Password Generator Service] Extracted password string is empty or whitespace.");
+      throw new Error('La API devolvió una contraseña vacía o inválida.');
     }
 
-    // La sanitización basada en `document.createElement` fue eliminada porque no funciona en Server Actions.
-    // Se asume que la API devuelve una contraseña limpia.
-
     return {
-      randomPassword: passwordString,
+      randomPassword: passwordString.trim(), // Ensure to trim whitespace
     };
 
   } catch (error) {
     console.error("[Password Generator Service] Error generating random password:", error);
     if (error instanceof Error) {
-        if(error.message.startsWith('Error de la API de RapidAPI:') || error.message.startsWith('Datos de entrada no válidos:') || error.message.startsWith('Configuración del servidor incompleta')) {
+        if(error.message.startsWith('Error de la API de RapidAPI:') || error.message.startsWith('Datos de entrada no válidos:') || error.message.startsWith('Configuración del servidor incompleta') || error.message.startsWith('La API devolvió una contraseña vacía')) {
             throw error;
           }
       throw new Error(`No se pudo generar la contraseña: ${error.message}`);
