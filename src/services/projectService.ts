@@ -1,3 +1,4 @@
+
 // src/services/projectService.ts
 'use server'; 
 
@@ -43,7 +44,7 @@ export async function addProjectToFirestore(projectData: ProjectFormData): Promi
     return docRef.id;
   } catch (error) {
     console.error("Error adding project to Firestore: ", error);
-    throw new Error("Failed to add project.");
+    throw new Error(`Failed to add project: ${(error as Error).message}`);
   }
 }
 
@@ -62,7 +63,9 @@ export async function getProjectsFromFirestore(): Promise<Project[]> {
     return projects;
   } catch (error) {
     console.error("Error fetching projects from Firestore: ", error);
-    return []; 
+    // For get operations that might return empty, it's often better to return empty or handle specific error types
+    // For now, re-throwing with details to help debug.
+    throw new Error(`Failed to fetch projects: ${(error as Error).message}`);
   }
 }
 
@@ -79,12 +82,12 @@ export async function getProjectByIdFromFirestore(projectId: string): Promise<Pr
     if (docSnap.exists()) {
       return mapDocToProject(docSnap, docSnap.id);
     } else {
-      console.log("No such project document!");
+      console.log("No such project document with ID:", projectId);
       return null;
     }
   } catch (error) {
     console.error("Error fetching project by ID from Firestore: ", error);
-    throw new Error("Failed to fetch project.");
+    throw new Error(`Failed to fetch project with ID ${projectId}: ${(error as Error).message}`);
   }
 }
 
@@ -103,7 +106,7 @@ export async function updateProjectInFirestore(projectId: string, projectData: P
     });
   } catch (error) {
     console.error("Error updating project in Firestore: ", error);
-    throw new Error("Failed to update project.");
+    throw new Error(`Failed to update project with ID ${projectId}: ${(error as Error).message}`);
   }
 }
 
