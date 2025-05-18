@@ -35,7 +35,8 @@ const PageSpeedLighthouseResultSchema = z.object({
   requestedUrl: z.string().url().optional(),
 });
 
-export const PageSpeedOutputSchema = z.object({
+// PageSpeedOutputSchema is now defined internally and not exported
+const PageSpeedOutputSchema = z.object({
   performanceScore: z.number(),
   firstContentfulPaint: z.string(),
   largestContentfulPaint: z.string(),
@@ -46,7 +47,7 @@ export const PageSpeedOutputSchema = z.object({
   requestedUrl: z.string().optional(),
   strategy: z.enum(['desktop', 'mobile']),
 });
-export type PageSpeedOutput = z.infer<typeof PageSpeedOutputSchema>;
+export type PageSpeedOutput = z.infer<typeof PageSpeedOutputSchema>; // The type is still exported
 
 export async function analyzePageSpeed(input: PageSpeedInputClient): Promise<PageSpeedOutput> {
   const validatedInput = PageSpeedInputClientSchema.safeParse(input);
