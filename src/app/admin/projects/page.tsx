@@ -1,4 +1,3 @@
-
 // src/app/admin/projects/page.tsx
 "use client";
 
@@ -24,12 +23,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import Image from 'next/image'; // Import next/image
 
 export default function AdminProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null); // Store ID of project being deleted
   const { toast } = useToast();
 
   const fetchProjects = useCallback(async () => {
@@ -57,28 +57,32 @@ export default function AdminProjectsPage() {
     fetchProjects();
   }, [fetchProjects]);
 
-  const handleDeleteProject = async (projectId: string, projectTitle: string) => {
-    setIsDeleting(true);
+  const handleDeleteProject = async (projectToDelete: Project) => {
+    if (!projectToDelete || !projectToDelete.id) {
+        toast({ title: "Error", description: "ID de proyecto inválido para eliminar.", variant: "destructive" });
+        return;
+    }
+    setIsDeleting(projectToDelete.id);
     try {
-      await deleteProjectFromFirestore(projectId);
+      // Pass the full project object to deleteProjectFromFirestore so it can access file URLs
+      await deleteProjectFromFirestore(projectToDelete.id, projectToDelete);
       toast({
         title: "Proyecto Eliminado",
-        description: `El proyecto "${projectTitle}" ha sido eliminado correctamente.`,
+        description: `El proyecto "${projectToDelete.title}" ha sido eliminado correctamente.`,
         variant: "default",
       });
-      // Refresh the list of projects
       await fetchProjects(); 
     } catch (err) {
-      console.error(`Error deleting project ${projectId}:`, err);
+      console.error(`Error deleting project ${projectToDelete.id}:`, err);
       const errorMessage = err instanceof Error ? err.message : "No se pudo eliminar el proyecto.";
-      setError(errorMessage); // Also set page-level error if needed
+      setError(errorMessage); 
       toast({
         title: "Error al Eliminar",
         description: errorMessage,
         variant: "destructive",
       });
     } finally {
-      setIsDeleting(false);
+      setIsDeleting(null);
     }
   };
 
@@ -121,32 +125,45 @@ export default function AdminProjectsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[250px]">Título</TableHead>
+                  <TableHead className="w-16 hidden md:table-cell">Miniatura</TableHead>
+                  <TableHead className="min-w-[150px]">Título</TableHead>
                   <TableHead>Categoría</TableHead>
-                  <TableHead>Tecnologías</TableHead>
+                  <TableHead className="hidden lg:table-cell">Tecnologías</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {projects.map((project) => (
                   <TableRow key={project.id}>
+                    <TableCell className="hidden md:table-cell">
+                      {project.thumbnailUrl && (
+                        <Image
+                          src={project.thumbnailUrl}
+                          alt={project.title}
+                          width={48}
+                          height={32}
+                          className="rounded object-cover aspect-[3/2]"
+                          data-ai-hint="project thumbnail"
+                        />
+                      )}
+                    </TableCell>
                     <TableCell className="font-medium">{project.title}</TableCell>
                     <TableCell>
                       <Badge variant="outline">{project.category}</Badge>
                     </TableCell>
-                    <TableCell className="max-w-xs truncate">
+                    <TableCell className="hidden lg:table-cell max-w-xs truncate">
                       {project.technologies.slice(0, 3).join(', ')}
                       {project.technologies.length > 3 && '...'}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" asChild className="mr-2" title="Editar Proyecto">
+                      <Button variant="ghost" size="icon" asChild className="mr-1" title="Editar Proyecto">
                         <Link href={`/admin/projects/${project.id}/edit`}>
                           <Edit3 className="h-4 w-4" />
                         </Link>
                       </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="icon" title="Eliminar Proyecto" disabled={isDeleting}>
+                          <Button variant="ghost" size="icon" title="Eliminar Proyecto" disabled={!!isDeleting}>
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
                         </AlertDialogTrigger>
@@ -155,17 +172,17 @@ export default function AdminProjectsPage() {
                             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
                             <AlertDialogDescription>
                               Esta acción no se puede deshacer. Esto eliminará permanentemente el proyecto
-                              <span className="font-semibold"> {project.title}</span> de la base de datos.
+                              <span className="font-semibold"> {project.title}</span> de la base de datos y sus archivos asociados de Storage.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction 
-                              onClick={() => handleDeleteProject(project.id, project.title)}
-                              disabled={isDeleting}
+                            <AlertDialogCancel disabled={isDeleting === project.id}>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteProject(project)}
+                              disabled={isDeleting === project.id}
                               className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                             >
-                              {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                              {isDeleting === project.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                               Eliminar
                             </AlertDialogAction>
                           </AlertDialogFooter>
@@ -176,7 +193,7 @@ export default function AdminProjectsPage() {
                 ))}
                 {projects.length === 0 && !isLoading && !error && (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                       No hay proyectos para mostrar en Firestore. ¡Añade uno nuevo!
                     </TableCell>
                   </TableRow>
