@@ -7,17 +7,17 @@ import { useFavorites } from '@/hooks/use-favorites';
 import {
   Dialog,
   DialogContent,
-  // DialogHeader, // No longer using DialogHeader wrapper for title/desc
-  // DialogTitle, // Using DialogPrimitive.Title directly
-  // DialogDescription, // Using DialogPrimitive.Description directly
+  DialogHeader, // Use standard DialogHeader
+  DialogTitle, // Use standard DialogTitle
+  DialogDescription, // Use standard DialogDescription
   DialogFooter,
 } from '@/components/ui/dialog';
-import * as DialogPrimitive from "@radix-ui/react-dialog"; // Import primitives
+// Removed: import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Heart, ExternalLink, Github, Download } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useId } from 'react';
+// Removed: import { useId } from 'react';
 
 interface ProjectModalProps {
   project: Project;
@@ -28,8 +28,8 @@ interface ProjectModalProps {
 export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
   const { toggleFavorite, isFavorite, isMounted } = useFavorites();
   const favorite = isMounted ? isFavorite(project.id) : false;
-  const titleId = useId();
-  const descriptionId = useId();
+  // Removed: const titleId = useId();
+  // Removed: const descriptionId = useId();
 
   let dataAiHintPreview = "project preview";
   if (project.title.toLowerCase().includes("ai")) dataAiHintPreview = "interface screenshot";
@@ -41,22 +41,16 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         className="sm:max-w-3xl md:max-w-4xl lg:max-w-5xl max-h-[90vh] p-0 rounded-xl shadow-2xl bg-card flex flex-col"
-        aria-labelledby={titleId}
-        aria-describedby={descriptionId}
+        // Removed aria-labelledby and aria-describedby to let shadcn/Radix handle it
       >
-        {/* Apply styling directly to Title and Description, making them direct children */}
-        <DialogPrimitive.Title 
-          id={titleId} 
-          className="text-3xl font-bold text-primary p-6 pb-2 text-left" // Added text-left
-        >
-          {project.title}
-        </DialogPrimitive.Title>
-        <DialogPrimitive.Description 
-          id={descriptionId} 
-          className="text-muted-foreground mt-1 px-6 pb-4 text-left border-b border-border" // Added text-left and adjusted padding
-        >
-          {project.category}
-        </DialogPrimitive.Description>
+        <DialogHeader className="p-6 pb-4 border-b border-border text-left">
+          <DialogTitle className="text-3xl font-bold text-primary mb-1">
+            {project.title}
+          </DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            {project.category}
+          </DialogDescription>
+        </DialogHeader>
 
         <ScrollArea className="flex-grow overflow-y-auto">
           <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
