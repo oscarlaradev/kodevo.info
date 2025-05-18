@@ -7,9 +7,9 @@ import { useFavorites } from '@/hooks/use-favorites';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  // DialogTitle, // We will use DialogPrimitive.Title directly
-  // DialogDescription, // We will use DialogPrimitive.Description directly
+  // DialogHeader, // No longer using DialogHeader wrapper for title/desc
+  // DialogTitle, // Using DialogPrimitive.Title directly
+  // DialogDescription, // Using DialogPrimitive.Description directly
   DialogFooter,
 } from '@/components/ui/dialog';
 import * as DialogPrimitive from "@radix-ui/react-dialog"; // Import primitives
@@ -44,10 +44,19 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
       >
-        <DialogHeader className="p-6 pb-4 text-left border-b border-border">
-          <DialogPrimitive.Title id={titleId} className="text-3xl font-bold text-primary">{project.title}</DialogPrimitive.Title>
-          <DialogPrimitive.Description id={descriptionId} className="text-muted-foreground mt-1">{project.category}</DialogPrimitive.Description>
-        </DialogHeader>
+        {/* Apply styling directly to Title and Description, making them direct children */}
+        <DialogPrimitive.Title 
+          id={titleId} 
+          className="text-3xl font-bold text-primary p-6 pb-2 text-left" // Added text-left
+        >
+          {project.title}
+        </DialogPrimitive.Title>
+        <DialogPrimitive.Description 
+          id={descriptionId} 
+          className="text-muted-foreground mt-1 px-6 pb-4 text-left border-b border-border" // Added text-left and adjusted padding
+        >
+          {project.category}
+        </DialogPrimitive.Description>
 
         <ScrollArea className="flex-grow overflow-y-auto">
           <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
