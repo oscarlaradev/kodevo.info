@@ -39,6 +39,7 @@ export function HeroSection() {
               </Link>
             </Button>
             <Button variant="outline" size="lg" asChild className="rounded-full shadow-md hover:shadow-lg transform transition-all hover:scale-105">
+              {/* Updated to AlexBryant_Resume.pdf */}
               <a href="/AlexBryant_Resume.pdf" download="AlexBryant_Resume.pdf">
                 <Download className="mr-2 h-5 w-5" /> Download CV
               </a>
