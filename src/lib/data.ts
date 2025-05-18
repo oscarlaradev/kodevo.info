@@ -1,3 +1,4 @@
+
 export interface Project {
   id: string;
   title: string;
@@ -23,7 +24,7 @@ export interface BioData {
 }
 
 export const bioData: BioData = {
-  name: "Alex Bryant", // You might want to update this to Oscar Lara
+  name: "Oscar Lara", // Updated name
   title: "Senior Full-Stack Developer",
   tagline: "Crafting elegant code, building performant applications.",
   about:
@@ -46,60 +47,6 @@ export const bioData: BioData = {
   ],
 };
 
-export const projectsData: Project[] = [
-  {
-    id: "1",
-    title: "EcoSort AI",
-    shortDescription: "AI-powered waste sorting assistant.",
-    longDescription:
-      "EcoSort AI is an innovative web application designed to help users correctly sort their waste using artificial intelligence. Upload an image of an item, and the AI identifies it, providing detailed sorting instructions. Built with Next.js for a fast frontend, Python/Flask for the AI backend, and deployed on Vercel.",
-    thumbnailUrl: "https://placehold.co/600x400.png",
-    previewUrl: "https://placehold.co/1200x800.png",
-    projectUrl: "https://example.com", // Actualizado para demostración
-    sourceCodeUrl: "#",
-    downloadUrl: "#", 
-    technologies: ["Next.js", "TypeScript", "Python", "Flask", "AI/ML", "Vercel"],
-    category: "Web App",
-  },
-  {
-    id: "2",
-    title: "Stellar Journey Planner",
-    shortDescription: "Interactive space travel itinerary builder.",
-    longDescription:
-      "Plan your hypothetical interstellar voyages with Stellar Journey Planner. This app uses real astronomical data to simulate travel times and conditions between star systems. Features a 3D starmap visualization. Developed using React, Three.js, and a custom-built physics engine.",
-    thumbnailUrl: "https://placehold.co/600x400.png",
-    previewUrl: "https://placehold.co/1200x800.png",
-    projectUrl: "#",
-    sourceCodeUrl: "#",
-    technologies: ["React", "Three.js", "Node.js", "API Integration"],
-    category: "Web App",
-  },
-  {
-    id: "3",
-    title: "DevPortfolio UI Kit",
-    shortDescription: "A UI kit for developers to build portfolios.",
-    longDescription:
-      "A comprehensive UI kit built with Tailwind CSS and React components, designed to help developers quickly scaffold beautiful and responsive portfolio websites. Includes various themes and customizable sections. This very portfolio is a testament to its capabilities!",
-    thumbnailUrl: "https://placehold.co/600x400.png",
-    previewUrl: "https://placehold.co/1200x800.png",
-    projectUrl: "#",
-    sourceCodeUrl: "#",
-    downloadUrl: "#",
-    technologies: ["React", "Tailwind CSS", "Storybook", "Figma"],
-    category: "UI Kit",
-  },
-  {
-    id: "4",
-    title: "Quantum Notes",
-    shortDescription: "Secure, end-to-end encrypted note-taking app.",
-    longDescription:
-      "Quantum Notes offers a privacy-focused note-taking experience with robust end-to-end encryption. Features include markdown support, tagging, and cross-device sync. Built using Electron, React, and a custom encryption library.",
-    thumbnailUrl: "https://placehold.co/600x400.png",
-    previewUrl: "https://placehold.co/1200x800.png",
-    projectUrl: "#", // Mantener '#' si no hay demo real
-    sourceCodeUrl: "#",
-    downloadUrl: "#", // Mantener '#' si no hay descarga
-    technologies: ["Electron", "React", "Cryptography", "SQLite"],
-    category: "Desktop App",
-  },
-];
+// Static projectsData is no longer the primary source for the /projects page.
+// It will be fetched from Firestore. This can be an empty array or kept for fallback/testing if needed.
+export const projectsData: Project[] = [];

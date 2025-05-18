@@ -3,21 +3,24 @@
 'use server'; 
 
 import { firestore } from '@/lib/firebase';
-import { collection, addDoc, getDocs, doc, serverTimestamp, Timestamp, getDoc, updateDoc, DocumentData } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, serverTimestamp, Timestamp, getDoc, updateDoc, deleteDoc, type DocumentData } from 'firebase/firestore';
 import type { ProjectFormData } from '@/lib/schemas';
 import type { Project } from '@/lib/data'; 
-import { FirebaseError } from 'firebase/app'; // Import FirebaseError
+import { FirebaseError } from 'firebase/app';
 
 // Helper function to convert Firestore document data to Project type
 function mapDocToProject(docSnap: DocumentData, id: string): Project {
   const data = docSnap.data();
+  // Ensure technologies is always an array, even if it's undefined or null in Firestore
+  const technologies = Array.isArray(data?.technologies) ? data.technologies : [];
+  
   return {
     id: id,
     title: data?.title || '',
     shortDescription: data?.shortDescription || '',
     longDescription: data?.longDescription || '',
     category: data?.category || '',
-    technologies: Array.isArray(data?.technologies) ? data.technologies : [],
+    technologies: technologies,
     thumbnailUrl: data?.thumbnailUrl || 'https://placehold.co/600x400.png',
     previewUrl: data?.previewUrl || 'https://placehold.co/1200x800.png',
     projectUrl: data?.projectUrl || undefined,
@@ -178,4 +181,33 @@ export async function updateProjectInFirestore(projectId: string, projectData: P
   }
 }
 
-// TODO: Implement deleteProjectFromFirestore function later
+/**
+ * Deletes a project from Firestore.
+ * @param projectId The ID of the project to delete.
+ * @returns A promise that resolves when the deletion is complete.
+ */
+export async function deleteProjectFromFirestore(projectId: string): Promise<void> {
+  console.log(`[Server Action] deleteProjectFromFirestore called for ID: ${projectId}`);
+  if (!projectId || typeof projectId !== 'string' || projectId.trim() === '') {
+    const invalidIdErrorMsg = 'Invalid project ID provided for deletion.';
+    console.error('[Server Action Error]', invalidIdErrorMsg, 'Received:', projectId);
+    throw new Error(invalidIdErrorMsg);
+  }
+  try {
+    const projectDocRef = doc(firestore, 'projects', projectId);
+    await deleteDoc(projectDocRef);
+    console.log(`[Server Action] Project with ID ${projectId} deleted successfully.`);
+  } catch (error) {
+    let errorMessage = `Failed to delete project with ID ${projectId}. An unknown error occurred.`;
+    if (error instanceof FirebaseError) {
+      errorMessage = `Firebase error deleting project ID ${projectId}: ${error.message} (Code: ${error.code})`;
+      console.error(`[Server Action FirebaseError] Error deleting project ${projectId} from Firestore: `, error.code, error.message, error.customData);
+    } else if (error instanceof Error) {
+      errorMessage = `Failed to delete project with ID ${projectId}: ${error.message}.`;
+      console.error(`[Server Action Error] Error deleting project ${projectId} from Firestore: `, error.name, error.message, error.stack);
+    } else {
+      console.error(`[Server Action Unknown Error] Error deleting project ${projectId} from Firestore: `, error);
+    }
+    throw new Error(errorMessage);
+  }
+}

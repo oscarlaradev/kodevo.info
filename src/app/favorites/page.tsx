@@ -1,47 +1,74 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ProjectList } from '@/components/projects/ProjectList';
-import { projectsData, type Project } from '@/lib/data';
+import type { Project } from '@/lib/data';
 import { useFavorites } from '@/hooks/use-favorites';
-import { HeartPulse } from 'lucide-react'; // Using a slightly different Heart icon for page title
-
-// Removed static metadata export as it's not allowed in Client Components
-// export const metadata = {
-//   title: 'My Favorite Projects - CodeCanvas',
-//   description: 'A collection of your saved favorite projects from CodeCanvas.',
-// };
+import { getProjectsFromFirestore } from '@/services/projectService'; // Import Firestore service
+import { HeartPulse, Loader2, AlertTriangle } from 'lucide-react'; 
 
 export default function FavoritesPage() {
-  const { favorites, isMounted } = useFavorites();
+  const { favorites, isMounted: favoritesMounted } = useFavorites();
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
   const [favoriteProjects, setFavoriteProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Dynamically set page title if needed
     document.title = 'My Favorite Projects - CodeCanvas';
   }, []);
 
+  // Fetch all projects once when favorites are mounted
   useEffect(() => {
-    if (isMounted) {
-      const filteredProjects = projectsData.filter(project => favorites.includes(project.id));
-      setFavoriteProjects(filteredProjects);
+    if (favoritesMounted) {
+      setIsLoading(true);
+      setError(null);
+      getProjectsFromFirestore()
+        .then(fetchedProjects => {
+          setAllProjects(fetchedProjects);
+        })
+        .catch(err => {
+          console.error("Error fetching projects for favorites page:", err);
+          setError(err instanceof Error ? err.message : "Could not load project details for favorites.");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
-  }, [favorites, isMounted]); // Removed projectsData from dependencies as it's stable
+  }, [favoritesMounted]);
 
-  if (!isMounted) {
-    // Optional: show a loading state or null until client-side hydration
-    // You can replace this with a Skeleton loader component if you have one
+  // Filter allProjects to get favoriteProjects when favorites or allProjects change
+  useEffect(() => {
+    if (favoritesMounted && allProjects.length > 0) {
+      const filteredProjects = allProjects.filter(project => favorites.includes(project.id));
+      setFavoriteProjects(filteredProjects);
+    } else if (favoritesMounted) { // Handle case where allProjects might be empty (e.g. no projects in DB)
+        setFavoriteProjects([]);
+    }
+  }, [favorites, allProjects, favoritesMounted]);
+
+  if (!favoritesMounted || isLoading) {
     return (
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
-        <div className="animate-pulse">
-          <HeartPulse className="h-16 w-16 text-muted mx-auto mb-4" />
-          <div className="h-8 bg-muted rounded w-1/2 mx-auto mb-4"></div>
-          <div className="h-4 bg-muted rounded w-3/4 mx-auto"></div>
-        </div>
+        <Loader2 className="h-16 w-16 text-primary mx-auto mb-4 animate-spin" />
+        <p className="text-lg text-muted-foreground">Loading your favorite projects...</p>
       </div>
     ); 
   }
+
+  if (error) {
+     return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
+        <div className="text-center py-10 bg-destructive/10 text-destructive p-6 rounded-lg shadow-md">
+          <AlertTriangle className="h-12 w-12 mx-auto mb-3" />
+          <h2 className="text-2xl font-semibold mb-2">Error Loading Favorites</h2>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+  
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">

@@ -1,42 +1,86 @@
+
 // src/app/admin/projects/page.tsx
 "use client";
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { PlusCircle, Edit3, Trash2, Loader2 } from 'lucide-react';
+import { PlusCircle, Edit3, Trash2, Loader2, AlertTriangle } from 'lucide-react';
 import type { Project } from '@/lib/data';
-import { getProjectsFromFirestore } from '@/services/projectService';
+import { getProjectsFromFirestore, deleteProjectFromFirestore } from '@/services/projectService';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = useToast();
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const fetchedProjects = await getProjectsFromFirestore();
-      // Sort projects by title, or createdAt if available and desired
       fetchedProjects.sort((a, b) => a.title.localeCompare(b.title));
       setProjects(fetchedProjects);
     } catch (err) {
       console.error("Error fetching projects for admin page:", err);
-      setError("No se pudieron cargar los proyectos. Intenta de nuevo más tarde.");
+      const errorMessage = err instanceof Error ? err.message : "No se pudieron cargar los proyectos. Intenta de nuevo más tarde.";
+      setError(errorMessage);
+      toast({
+        title: "Error al Cargar Proyectos",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchProjects();
-  }, []);
+  }, [fetchProjects]);
 
+  const handleDeleteProject = async (projectId: string, projectTitle: string) => {
+    setIsDeleting(true);
+    try {
+      await deleteProjectFromFirestore(projectId);
+      toast({
+        title: "Proyecto Eliminado",
+        description: `El proyecto "${projectTitle}" ha sido eliminado correctamente.`,
+        variant: "default",
+      });
+      // Refresh the list of projects
+      await fetchProjects(); 
+    } catch (err) {
+      console.error(`Error deleting project ${projectId}:`, err);
+      const errorMessage = err instanceof Error ? err.message : "No se pudo eliminar el proyecto.";
+      setError(errorMessage); // Also set page-level error if needed
+      toast({
+        title: "Error al Eliminar",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="container mx-auto py-8">
@@ -53,7 +97,7 @@ export default function AdminProjectsPage() {
         <CardHeader>
           <CardTitle>Lista de Proyectos ({isLoading ? '...' : projects.length})</CardTitle>
           <CardDescription>
-            Mostrando proyectos desde Firebase Firestore. La funcionalidad de eliminar se añadirá pronto.
+            Mostrando proyectos desde Firebase Firestore.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -64,9 +108,11 @@ export default function AdminProjectsPage() {
             </div>
           )}
           {error && !isLoading && (
-            <div className="text-center py-10 text-destructive">
-              <p>{error}</p>
-              <Button onClick={fetchProjects} variant="outline" className="mt-4">
+            <div className="text-center py-10 text-destructive bg-destructive/10 p-4 rounded-md">
+              <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
+              <p className="font-semibold mb-1">Error al Cargar Proyectos</p>
+              <p className="text-sm mb-3">{error}</p>
+              <Button onClick={fetchProjects} variant="outline">
                 Reintentar
               </Button>
             </div>
@@ -98,13 +144,37 @@ export default function AdminProjectsPage() {
                           <Edit3 className="h-4 w-4" />
                         </Link>
                       </Button>
-                      <Button variant="ghost" size="icon" disabled title="Eliminar (Próximamente)">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" title="Eliminar Proyecto" disabled={isDeleting}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Esta acción no se puede deshacer. Esto eliminará permanentemente el proyecto
+                              <span className="font-semibold"> {project.title}</span> de la base de datos.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => handleDeleteProject(project.id, project.title)}
+                              disabled={isDeleting}
+                              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                            >
+                              {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                              Eliminar
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </TableCell>
                   </TableRow>
                 ))}
-                {projects.length === 0 && !isLoading && (
+                {projects.length === 0 && !isLoading && !error && (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                       No hay proyectos para mostrar en Firestore. ¡Añade uno nuevo!
