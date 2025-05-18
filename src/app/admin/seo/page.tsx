@@ -1,5 +1,5 @@
 // src/app/admin/seo/page.tsx
-"use client"; // This page will have interactive elements
+"use client";
 
 import Link from 'next/link';
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
@@ -8,16 +8,59 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Search, FileText, Lightbulb, Link2, Settings2, BarChart3 } from "lucide-react";
+import { ArrowLeft, Search, FileText, Lightbulb, Link2, Settings2, BarChart3, Loader2, AlertTriangle } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/accordion";
+import { useState } from 'react';
+import { generateSeoContentIdeas, type SeoContentIdeasInput } from '@/ai/flows/generate-seo-ideas-flow';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SeoToolsPage() {
+  const [ideaTopic, setIdeaTopic] = useState('');
+  const [generatedIdeas, setGeneratedIdeas] = useState<string[]>([]);
+  const [isGeneratingIdeas, setIsGeneratingIdeas] = useState(false);
+  const [ideasError, setIdeasError] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleGenerateIdeas = async () => {
+    if (!ideaTopic.trim()) {
+      setIdeasError("Por favor, introduce un tema para generar ideas.");
+      return;
+    }
+    setIsGeneratingIdeas(true);
+    setGeneratedIdeas([]);
+    setIdeasError(null);
+    try {
+      const input: SeoContentIdeasInput = { topic: ideaTopic };
+      const result = await generateSeoContentIdeas(input);
+      if (result && result.ideas) {
+        setGeneratedIdeas(result.ideas);
+        toast({
+          title: "Ideas Generadas",
+          description: "Se han generado nuevas ideas de contenido.",
+        });
+      } else {
+        throw new Error("La respuesta del generador de ideas no fue válida.");
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+      console.error("Error generating SEO ideas:", errorMessage);
+      setIdeasError(`Error: ${errorMessage}`);
+      toast({
+        title: "Error al Generar Ideas",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingIdeas(false);
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 px-4 md:px-6 lg:px-8">
       <AdminPageHeader title="Herramientas SEO Avanzadas" description="Potencia el posicionamiento de tu portafolio en buscadores.">
@@ -92,7 +135,7 @@ export default function SeoToolsPage() {
           </CardContent>
         </Card>
         
-        {/* Tool 4: Content Idea Generator (AI) */}
+        {/* Tool 4: Content Idea Generator (AI) - NOW FUNCTIONAL */}
         <Card className="shadow-lg rounded-lg">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
@@ -103,11 +146,39 @@ export default function SeoToolsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <Label htmlFor="topic-input">Tema Principal / Proyecto</Label>
-              <Input id="topic-input" placeholder="Ej: Nuevas tendencias en React" disabled />
+              <Label htmlFor="topic-input-ai">Tema Principal / Proyecto</Label>
+              <Input 
+                id="topic-input-ai" 
+                placeholder="Ej: Nuevas tendencias en React" 
+                value={ideaTopic}
+                onChange={(e) => setIdeaTopic(e.target.value)}
+                disabled={isGeneratingIdeas}
+              />
             </div>
-            <Button className="mt-4 w-full" disabled>Generar Ideas con IA</Button>
-            <p className="text-xs text-muted-foreground mt-2">Integración con Genkit próximamente.</p>
+            <Button 
+              className="mt-4 w-full" 
+              onClick={handleGenerateIdeas}
+              disabled={isGeneratingIdeas}
+            >
+              {isGeneratingIdeas ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {isGeneratingIdeas ? 'Generando...' : 'Generar Ideas con IA'}
+            </Button>
+            {ideasError && (
+              <div className="mt-3 text-sm text-destructive bg-destructive/10 p-3 rounded-md flex items-center">
+                <AlertTriangle className="h-4 w-4 mr-2 shrink-0" />
+                {ideasError}
+              </div>
+            )}
+            {generatedIdeas.length > 0 && (
+              <div className="mt-4 space-y-2">
+                <h4 className="font-medium text-foreground">Ideas Generadas:</h4>
+                <ul className="list-disc list-inside pl-4 text-sm text-muted-foreground bg-muted/50 p-3 rounded-md">
+                  {generatedIdeas.map((idea, index) => (
+                    <li key={index}>{idea}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </CardContent>
         </Card>
 
