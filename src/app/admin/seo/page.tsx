@@ -1,4 +1,3 @@
-
 // src/app/admin/seo/page.tsx
 "use client";
 
