@@ -31,33 +31,30 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Compute defaultValues correctly, ensuring technologies is a string for the form input
+  const computedDefaultValues = {
+    title: initialData?.title || "",
+    shortDescription: initialData?.shortDescription || "",
+    longDescription: initialData?.longDescription || "",
+    category: initialData?.category || "",
+    technologies: (initialData?.technologies && Array.isArray(initialData.technologies))
+      ? initialData.technologies.join(', ') // For editing: convert string[] from ProjectFormData to string
+      : (initialData?.technologies as unknown as string || ""), // Handle if initialData.technologies is already a string, or default to empty string for new
+    projectUrl: initialData?.projectUrl || "",
+    sourceCodeUrl: initialData?.sourceCodeUrl || "",
+    thumbnailUrl: initialData?.thumbnailUrl || "https://placehold.co/600x400.png",
+    previewUrl: initialData?.previewUrl || "https://placehold.co/1200x800.png",
+  };
+
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
-    defaultValues: initialData || {
-      title: "",
-      shortDescription: "",
-      longDescription: "",
-      category: "",
-      technologies: [], // Will be stored as comma-separated string in form
-      projectUrl: "",
-      sourceCodeUrl: "",
-      thumbnailUrl: "https://placehold.co/600x400.png", // Default placeholder
-      previewUrl: "https://placehold.co/1200x800.png",  // Default placeholder
-    },
+    defaultValues: computedDefaultValues,
   });
   
-  // Adjust defaultValues for technologies if initialData is present
-  if (initialData && initialData.technologies && Array.isArray(initialData.technologies)) {
-    form.reset({
-      ...initialData,
-      technologies: initialData.technologies.join(', '),
-    });
-  }
-
-
   async function onSubmit(values: ProjectFormData) {
     setIsSubmitting(true);
-    console.log("Project form data:", values);
+    console.log("Project form data (after Zod transformation):", values);
+    // Note: values.technologies will be string[] here due to Zod transform
 
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -155,11 +152,14 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
             <FormField
             control={form.control}
             name="technologies"
-            render={({ field }) => (
+            render={({ field }) => ( // field.value here will be a string
                 <FormItem>
                 <FormLabel>Tecnologías Usadas</FormLabel>
                 <FormControl>
-                    <Input placeholder="Ej: React, Next.js, Firebase" {...field} />
+                    <Input 
+                      placeholder="Ej: React, Next.js, Firebase" 
+                      {...field} // Input expects value to be a string
+                    />
                 </FormControl>
                 <FormDescription>
                     Separa las tecnologías con comas.
