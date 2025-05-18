@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Menu, X, Heart } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet'; // Added SheetTrigger
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -29,8 +29,10 @@ export function Header() {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out',
-        isScrolled ? 'bg-background/80 shadow-lg backdrop-blur-md' : 'bg-transparent'
+        'fixed top-4 left-4 right-4 z-50 transition-all duration-300 ease-in-out rounded-xl', // Márgenes para efecto flotante y bordes redondeados
+        isScrolled 
+          ? 'bg-background/90 shadow-xl backdrop-blur-lg' // Más pronunciado al hacer scroll
+          : 'bg-background/80 shadow-lg backdrop-blur-md' // Fondo y sombra base para efecto flotante
       )}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
