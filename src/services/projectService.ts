@@ -1,7 +1,8 @@
+
 // src/services/projectService.ts
 'use server';
 
-import { firestore, storage } from '@/lib/firebase';
+import { firestore } from '@/lib/firebase'; // Removed storage import as it's not used for uploads now
 import {
   collection,
   addDoc,
@@ -14,21 +15,15 @@ import {
   deleteDoc,
   type DocumentData,
 } from 'firebase/firestore';
-import {
-  ref as storageRef,
-  uploadString,
-  getDownloadURL,
-  deleteObject,
-} from 'firebase/storage';
+// Removed Firebase Storage imports: ref as storageRef, uploadString, getDownloadURL, deleteObject
 import type { ProjectFormData } from '@/lib/schemas';
 import type { Project } from '@/lib/data';
 import { FirebaseError } from 'firebase/app';
-import { v4 as uuidv4 } from 'uuid'; // For generating unique filenames
+// Removed uuid import
 
 // Helper function to convert Firestore document data to Project type
 function mapDocToProject(docSnap: DocumentData, id: string): Project {
   const data = docSnap.data();
-  // Ensure technologies is always an array, even if it's undefined or null in Firestore
   const technologies = Array.isArray(data?.technologies)
     ? data.technologies
     : [];
@@ -45,66 +40,10 @@ function mapDocToProject(docSnap: DocumentData, id: string): Project {
     projectUrl: data?.projectUrl || undefined,
     sourceCodeUrl: data?.sourceCodeUrl || undefined,
     downloadUrl: data?.downloadUrl || undefined,
-    // Optionally convert Timestamps if you add them to the Project type
-    // createdAt: (data?.createdAt as Timestamp)?.toDate(),
-    // updatedAt: (data?.updatedAt as Timestamp)?.toDate(),
   };
 }
 
-/**
- * Uploads a file (from a Data URI) to Firebase Storage and returns its public URL.
- * @param dataUri The file content as a Data URI.
- * @param pathPrefix The prefix for the storage path (e.g., 'thumbnails', 'project_files').
- * @param originalFileName The original name of the file, used to extract the extension.
- * @returns The public URL of the uploaded file.
- */
-export async function uploadFileFromDataUri(
-  dataUri: string,
-  pathPrefix: 'thumbnails' | 'previews' | 'downloads',
-  originalFileName: string
-): Promise<string> {
-  console.log(`[Server Action] uploadFileFromDataUri called for prefix: ${pathPrefix}, filename: ${originalFileName}`);
-  try {
-    const mimeTypeMatch = dataUri.match(/^data:(.+);base64,/);
-    if (!mimeTypeMatch || !mimeTypeMatch[1]) {
-      throw new Error('Invalid Data URI: MIME type not found.');
-    }
-    const mimeType = mimeTypeMatch[1];
-    const base64Data = dataUri.split(',')[1];
-
-    if (!base64Data) {
-      throw new Error('Invalid Data URI: Base64 data not found.');
-    }
-    
-    const fileExtension = originalFileName.split('.').pop() || 'file';
-    const uniqueFileName = `${uuidv4()}.${fileExtension}`;
-    const filePath = `${pathPrefix}/${uniqueFileName}`;
-    
-    const fileStorageRef = storageRef(storage, filePath);
-
-    console.log(`[Server Action] Uploading to Storage path: ${filePath} with MIME type: ${mimeType}`);
-    const snapshot = await uploadString(fileStorageRef, base64Data, 'base64', {
-      contentType: mimeType,
-    });
-
-    const downloadURL = await getDownloadURL(snapshot.ref);
-    console.log('[Server Action] File uploaded successfully. Download URL:', downloadURL);
-    return downloadURL;
-  } catch (error) {
-    let errorMessage = `Failed to upload file ${originalFileName}. An unknown error occurred.`;
-     if (error instanceof FirebaseError) {
-      errorMessage = `Firebase error uploading file: ${error.message} (Code: ${error.code})`;
-      console.error("[Server Action FirebaseError] Error uploading file to Storage: ", error.code, error.message, error.customData);
-    } else if (error instanceof Error) {
-      errorMessage = `Failed to upload file: ${error.message}.`;
-      console.error("[Server Action Error] Error uploading file to Storage: ", error.name, error.message, error.stack);
-    } else {
-      console.error("[Server Action Unknown Error] Error uploading file to Storage: ", error);
-    }
-    throw new Error(errorMessage);
-  }
-}
-
+// uploadFileFromDataUri function removed
 
 /**
  * Adds a new project to Firestore.
@@ -257,12 +196,11 @@ export async function updateProjectInFirestore(projectId: string, projectData: P
 }
 
 /**
- * Deletes a project from Firestore. Also attempts to delete associated files from Storage if their URLs are stored.
+ * Deletes a project from Firestore.
  * @param projectId The ID of the project to delete.
- * @param project An optional project object containing file URLs to delete from Storage.
  * @returns A promise that resolves when the deletion is complete.
  */
-export async function deleteProjectFromFirestore(projectId: string, project?: Project): Promise<void> {
+export async function deleteProjectFromFirestore(projectId: string): Promise<void> {
   console.log(`[Server Action] deleteProjectFromFirestore called for ID: ${projectId}`);
   if (!projectId || typeof projectId !== 'string' || projectId.trim() === '') {
     const invalidIdErrorMsg = 'Invalid project ID provided for deletion.';
@@ -270,36 +208,7 @@ export async function deleteProjectFromFirestore(projectId: string, project?: Pr
     throw new Error(invalidIdErrorMsg);
   }
   try {
-    // Attempt to delete associated files from Firebase Storage
-    if (project) {
-      const fileUrlsToDelete: (string | undefined)[] = [
-        project.thumbnailUrl,
-        project.previewUrl,
-        project.downloadUrl,
-      ];
-      for (const url of fileUrlsToDelete) {
-        if (url && url.includes('firebasestorage.googleapis.com')) {
-          try {
-            // Extract the path from the URL. Example:
-            // https://firebasestorage.googleapis.com/v0/b/your-bucket.appspot.com/o/thumbnails%2Fimage.png?alt=media&token=...
-            // The path is "thumbnails/image.png" (after unescaping)
-            const pathWithBucket = url.split('/o/')[1].split('?')[0];
-            const decodedPath = decodeURIComponent(pathWithBucket);
-            const fileRef = storageRef(storage, decodedPath);
-            await deleteObject(fileRef);
-            console.log(`[Server Action] Successfully deleted file from Storage: ${decodedPath}`);
-          } catch (storageError) {
-            if (storageError instanceof FirebaseError && storageError.code === 'storage/object-not-found') {
-              console.warn(`[Server Action] File not found in Storage (may have been already deleted or URL was incorrect): ${url}`, storageError.message);
-            } else {
-              console.error(`[Server Action] Error deleting file from Storage: ${url}`, storageError);
-              // Decide if you want to throw here or just log and continue with Firestore deletion
-            }
-          }
-        }
-      }
-    }
-
+    // File deletion logic from Firebase Storage is removed
     const projectDocRef = doc(firestore, 'projects', projectId);
     await deleteDoc(projectDocRef);
     console.log(`[Server Action] Project with ID ${projectId} deleted successfully from Firestore.`);

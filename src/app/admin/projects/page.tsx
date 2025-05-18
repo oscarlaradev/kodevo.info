@@ -1,3 +1,4 @@
+
 // src/app/admin/projects/page.tsx
 "use client";
 
@@ -23,13 +24,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import Image from 'next/image'; // Import next/image
+import Image from 'next/image';
 
 export default function AdminProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState<string | null>(null); // Store ID of project being deleted
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fetchProjects = useCallback(async () => {
@@ -64,8 +65,7 @@ export default function AdminProjectsPage() {
     }
     setIsDeleting(projectToDelete.id);
     try {
-      // Pass the full project object to deleteProjectFromFirestore so it can access file URLs
-      await deleteProjectFromFirestore(projectToDelete.id, projectToDelete);
+      await deleteProjectFromFirestore(projectToDelete.id); // Pass only ID
       toast({
         title: "Proyecto Eliminado",
         description: `El proyecto "${projectToDelete.title}" ha sido eliminado correctamente.`,
@@ -172,7 +172,7 @@ export default function AdminProjectsPage() {
                             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
                             <AlertDialogDescription>
                               Esta acción no se puede deshacer. Esto eliminará permanentemente el proyecto
-                              <span className="font-semibold"> {project.title}</span> de la base de datos y sus archivos asociados de Storage.
+                              <span className="font-semibold"> {project.title}</span> de la base de datos.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
