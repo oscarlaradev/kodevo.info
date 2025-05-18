@@ -1,8 +1,13 @@
+// src/app/providers.tsx
 "use client";
 
 import type { ReactNode } from 'react';
+import { AuthProvider } from '@/context/AuthContext'; // Import AuthProvider
 
 export function Providers({ children }: { children: ReactNode }) {
-  // In the future, you can add ThemeProvider or other client-side providers here
-  return <>{children}</>;
+  return (
+    <AuthProvider> {/* Wrap children with AuthProvider */}
+      {children}
+    </AuthProvider>
+  );
 }
