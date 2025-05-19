@@ -1,4 +1,3 @@
-
 // src/components/admin/ProjectForm.tsx
 "use client";
 
@@ -6,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { ProjectFormData } from "@/lib/schemas";
 import { projectSchema } from "@/lib/schemas";
-import { addProjectToFirestore, updateProjectInFirestore } from "@/services/projectService";
-import type { Project } from "@/lib/data";
+import { addProjectToFirestore, updateProjectInFirestore } from '@/services/projectService';
+import type { Project } from '@/lib/data';
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,13 +22,46 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react"; // Added useMemo
 import { useRouter } from 'next/navigation';
 
 interface ProjectFormProps {
-  initialData?: Project;
+  initialData?: Project | null; // Allow null for initialData
   onSubmitSuccess?: (projectId: string) => void;
 }
+
+// Define default values for a new project to ensure technologies is always a string
+const newProjectDefaultValues: ProjectFormData = {
+  title: "",
+  shortDescription: "",
+  longDescription: "",
+  category: "",
+  technologies: [], // Zod transform will handle string input, but react-hook-form may prefer array here for type safety
+  projectUrl: "",
+  sourceCodeUrl: "",
+  thumbnailUrl: "", // Will be URLs
+  previewUrl: "",   // Will be URLs
+  downloadUrl: "",  // Will be URL
+};
+
+// Helper to transform Project to ProjectFormData for the form
+const projectToFormData = (project: Project | null | undefined): Partial<ProjectFormData> => {
+  if (!project) return newProjectDefaultValues;
+  return {
+    title: project.title,
+    shortDescription: project.shortDescription,
+    longDescription: project.longDescription,
+    category: project.category,
+    // Ensure technologies is always a string for the form field, Zod will transform it
+    technologies: Array.isArray(project.technologies) ? project.technologies : [],
+    projectUrl: project.projectUrl || "",
+    sourceCodeUrl: project.sourceCodeUrl || "",
+    thumbnailUrl: project.thumbnailUrl || "",
+    previewUrl: project.previewUrl || "",
+    downloadUrl: project.downloadUrl || "",
+  };
+};
+
 
 export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) {
   const { toast } = useToast();
@@ -37,61 +69,73 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const isEditMode = !!initialData?.id;
 
-  const computedDefaultValues = {
-    title: initialData?.title || "",
-    shortDescription: initialData?.shortDescription || "",
-    longDescription: initialData?.longDescription || "",
-    category: initialData?.category || "",
-    technologies: initialData?.technologies
-      ? (Array.isArray(initialData.technologies) ? initialData.technologies.join(', ') : String(initialData.technologies))
-      : "",
-    projectUrl: initialData?.projectUrl || "",
-    sourceCodeUrl: initialData?.sourceCodeUrl || "",
-    thumbnailUrl: initialData?.thumbnailUrl || "",
-    previewUrl: initialData?.previewUrl || "",
-    downloadUrl: initialData?.downloadUrl || "",
-  };
-
-  const form = useForm<ProjectFormData>({
-    resolver: zodResolver(projectSchema),
-    defaultValues: computedDefaultValues,
-  });
-
-  useEffect(() => {
-    // Reset form with initialData when it changes, or with computedDefaultValues if no initialData
-    form.reset(initialData ? {
-        title: initialData.title,
-        shortDescription: initialData.shortDescription,
-        longDescription: initialData.longDescription,
-        category: initialData.category,
-        technologies: Array.isArray(initialData.technologies) ? initialData.technologies.join(', ') : String(initialData.technologies || ''),
+  // Memoize default values to prevent unnecessary re-renders or effect triggers
+  const formDefaultValues = useMemo(() => {
+    if (initialData) {
+      return {
+        title: initialData.title || "",
+        shortDescription: initialData.shortDescription || "",
+        longDescription: initialData.longDescription || "",
+        category: initialData.category || "",
+        // The form field expects a string, Zod schema handles string[]
+        technologies: Array.isArray(initialData.technologies) ? initialData.technologies.join(', ') : "",
         projectUrl: initialData.projectUrl || "",
         sourceCodeUrl: initialData.sourceCodeUrl || "",
         thumbnailUrl: initialData.thumbnailUrl || "",
         previewUrl: initialData.previewUrl || "",
         downloadUrl: initialData.downloadUrl || "",
-    } : computedDefaultValues);
-  }, [initialData, form.reset, computedDefaultValues]);
+      };
+    }
+    return { // Defaults for a new project
+      title: "",
+      shortDescription: "",
+      longDescription: "",
+      category: "",
+      technologies: "", // Zod schema starts with string
+      projectUrl: "",
+      sourceCodeUrl: "",
+      thumbnailUrl: "",
+      previewUrl: "",
+      downloadUrl: "",
+    };
+  }, [initialData]);
+
+  const form = useForm<ProjectFormData>({
+    resolver: zodResolver(projectSchema),
+    defaultValues: formDefaultValues,
+  });
+  
+  useEffect(() => {
+    // When initialData changes (e.g., loading for edit page, or switching between new/edit)
+    // Reset the form with the new defaultValues.
+    // The `formDefaultValues` itself is memoized and only changes if `initialData` changes.
+    form.reset(formDefaultValues);
+  }, [formDefaultValues, form.reset]);
 
 
   async function onSubmit(values: ProjectFormData) {
     setIsSubmittingForm(true);
+    // The 'technologies' field from Zod validated 'values' will be string[]
+    // The service functions expect ProjectFormData which has technologies as string[]
+    // So, no further transformation of values.technologies is needed here if schema is correct.
 
     try {
       let projectId = initialData?.id;
       if (isEditMode && projectId) {
+        // `values` from Zod already has technologies as string[]
         await updateProjectInFirestore(projectId, values);
         toast({
           title: "Proyecto Actualizado",
           description: `El proyecto "${values.title}" ha sido actualizado.`,
         });
       } else {
+        // `values` from Zod already has technologies as string[]
         projectId = await addProjectToFirestore(values);
         toast({
           title: "Proyecto Guardado",
           description: `El proyecto "${values.title}" ha sido guardado con ID: ${projectId}.`,
         });
-        form.reset(computedDefaultValues); // Reset form fields after successful creation
+        form.reset(formDefaultValues); // Reset form fields after successful creation
       }
 
       if (onSubmitSuccess && projectId) {
@@ -102,11 +146,13 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
       }
 
     } catch (error) {
+      const err = error as Error;
       toast({
         title: "Error al Guardar Proyecto",
-        description: (error as Error).message || "No se pudo guardar el proyecto.",
+        description: err.message || "No se pudo guardar el proyecto. Revisa los logs del servidor para más detalles.",
         variant: "destructive",
       });
+      console.error("[ProjectForm Error] onSubmit:", err.message, err.stack);
     } finally {
       setIsSubmittingForm(false);
     }
@@ -179,7 +225,15 @@ export function ProjectForm({ initialData, onSubmitSuccess }: ProjectFormProps) 
               <FormItem>
                 <FormLabel>Tecnologías Usadas</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ej: React, Next.js, Firebase" {...field} disabled={isSubmittingForm} />
+                  {/* The field.value here should be the string from the form state */}
+                  <Input 
+                    placeholder="Ej: React, Next.js, Firebase" 
+                    {...field} 
+                    // Ensure field.value is treated as a string for the Input component
+                    value={typeof field.value === 'string' ? field.value : (Array.isArray(field.value) ? field.value.join(', ') : '')}
+                    onChange={(e) => field.onChange(e.target.value)} // Ensure onChange passes string
+                    disabled={isSubmittingForm} 
+                  />
                 </FormControl>
                 <FormDescription>Separa las tecnologías con comas.</FormDescription>
                 <FormMessage />
