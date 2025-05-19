@@ -14,17 +14,27 @@ import {
   updateDoc,
   deleteDoc,
   type DocumentData,
+  query,
+  orderBy, // Import orderBy
 } from 'firebase/firestore';
 import type { ProjectFormData } from '@/lib/schemas';
 import type { Project } from '@/lib/data';
 import { FirebaseError } from 'firebase/app';
+import { revalidatePath } from 'next/cache'; // Import revalidatePath
+
+const FIRESTORE_UNINITIALIZED_ERROR = "Firestore no está inicializado. Verifica la configuración de Firebase en src/lib/firebase.ts, asegúrate de que todas las variables de entorno NEXT_PUBLIC_FIREBASE_... estén correctamente definidas (ej. en .env.local o en Vercel) y que hayas reiniciado el servidor de desarrollo si hiciste cambios recientes en .env.local. Revisa los logs del servidor ANTERIORES a este mensaje para errores de inicialización de Firebase.";
+
 
 // Helper function to convert Firestore document data to Project type
 function mapDocToProject(docSnap: DocumentData, id: string): Project {
   const data = docSnap.data();
+  // Ensure technologies is always an array, even if undefined or null in Firestore
   const technologies = Array.isArray(data?.technologies)
     ? data.technologies
-    : [];
+    : (typeof data?.technologies === 'string' && data.technologies.length > 0 
+        ? data.technologies.split(',').map((t: string) => t.trim()) 
+        : []);
+
 
   return {
     id: id,
@@ -48,21 +58,27 @@ function mapDocToProject(docSnap: DocumentData, id: string): Project {
  */
 export async function addProjectToFirestore(projectData: ProjectFormData): Promise<string> {
   console.log('[Acción de Servidor] addProjectToFirestore llamada con:', JSON.stringify(projectData, null, 2));
+  if (!firestore) {
+    console.error("[Acción de Servidor Error] addProjectToFirestore:", FIRESTORE_UNINITIALIZED_ERROR);
+    throw new Error(FIRESTORE_UNINITIALIZED_ERROR);
+  }
   try {
     const projectsCollectionRef = collection(firestore, 'projects');
-    const technologiesArray = Array.isArray(projectData.technologies)
-      ? projectData.technologies
-      : (typeof projectData.technologies === 'string' ? projectData.technologies.split(',').map(t => t.trim()).filter(Boolean) : []);
-
+    // projectData.technologies ya es un array de strings gracias a la validación de Zod
     const docData = {
       ...projectData,
-      technologies: technologiesArray,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
     console.log('[Acción de Servidor] Datos del documento a añadir:', JSON.stringify(docData, null, 2));
     const docRef = await addDoc(projectsCollectionRef, docData);
     console.log('[Acción de Servidor] Proyecto añadido con ID:', docRef.id);
+    
+    // Revalidate public paths
+    revalidatePath('/');
+    revalidatePath('/projects');
+    revalidatePath('/favorites');
+
     return docRef.id;
   } catch (error) {
     let errorMessage = "No se pudo añadir el proyecto. Ocurrió un error desconocido.";
@@ -85,9 +101,19 @@ export async function addProjectToFirestore(projectData: ProjectFormData): Promi
  */
 export async function getProjectsFromFirestore(): Promise<Project[]> {
   console.log('[Acción de Servidor] getProjectsFromFirestore llamada');
+  if (!firestore) {
+    console.error("[Acción de Servidor Error] getProjectsFromFirestore:", FIRESTORE_UNINITIALIZED_ERROR);
+    throw new Error(FIRESTORE_UNINITIALIZED_ERROR);
+  }
   try {
     const projectsCollectionRef = collection(firestore, 'projects');
-    const querySnapshot = await getDocs(projectsCollectionRef);
+    // Add orderBy clause to sort by createdAt in descending order (newest first)
+    // For this to work efficiently, you might need to create a composite index in Firestore
+    // for the 'projects' collection on 'createdAt' descending. Firestore will usually prompt
+    // you in the console logs of your Firebase Functions or client app if an index is needed.
+    const q = query(projectsCollectionRef, orderBy("createdAt", "desc"));
+    const querySnapshot = await getDocs(q);
+
 
     const projects: Project[] = querySnapshot.docs.map(docSnap => {
       return mapDocToProject(docSnap, docSnap.id);
@@ -116,6 +142,10 @@ export async function getProjectsFromFirestore(): Promise<Project[]> {
  */
 export async function getProjectByIdFromFirestore(projectId: string): Promise<Project | null> {
   console.log(`[Acción de Servidor] getProjectByIdFromFirestore llamada para ID: ${projectId}`);
+  if (!firestore) {
+    console.error("[Acción de Servidor Error] getProjectByIdFromFirestore:", FIRESTORE_UNINITIALIZED_ERROR);
+    throw new Error(FIRESTORE_UNINITIALIZED_ERROR);
+  }
   if (!projectId || typeof projectId !== 'string' || projectId.trim() === '') {
     const invalidIdErrorMsg = 'ID de proyecto inválido proporcionado a getProjectByIdFromFirestore.';
     console.error('[Acción de Servidor Error]', invalidIdErrorMsg, 'Recibido:', projectId);
@@ -156,6 +186,10 @@ export async function getProjectByIdFromFirestore(projectId: string): Promise<Pr
  */
 export async function updateProjectInFirestore(projectId: string, projectData: ProjectFormData): Promise<void> {
   console.log(`[Acción de Servidor] updateProjectInFirestore llamada para ID: ${projectId} con datos:`, JSON.stringify(projectData, null, 2));
+  if (!firestore) {
+    console.error("[Acción de Servidor Error] updateProjectInFirestore:", FIRESTORE_UNINITIALIZED_ERROR);
+    throw new Error(FIRESTORE_UNINITIALIZED_ERROR);
+  }
    if (!projectId || typeof projectId !== 'string' || projectId.trim() === '') {
     const invalidIdErrorMsg = 'ID de proyecto inválido proporcionado para actualizar en updateProjectInFirestore.';
     console.error('[Acción de Servidor Error]', invalidIdErrorMsg, 'Recibido:', projectId);
@@ -163,20 +197,21 @@ export async function updateProjectInFirestore(projectId: string, projectData: P
   }
   try {
     const projectDocRef = doc(firestore, 'projects', projectId);
-    const technologiesArray = Array.isArray(projectData.technologies)
-      ? projectData.technologies
-      : (typeof projectData.technologies === 'string' ? projectData.technologies.split(',').map(t => t.trim()).filter(Boolean) : []);
-
+    // projectData.technologies ya es un array de strings gracias a la validación de Zod
     const docData = {
       ...projectData,
-      technologies: technologiesArray,
       updatedAt: serverTimestamp(),
     };
     console.log('[Acción de Servidor] Datos del documento a actualizar:', JSON.stringify(docData, null, 2));
     await updateDoc(projectDocRef, docData);
     console.log(`[Acción de Servidor] Proyecto con ID ${projectId} actualizado exitosamente.`);
-  } catch (error)
- {
+
+    // Revalidate public paths
+    revalidatePath('/');
+    revalidatePath('/projects');
+    revalidatePath('/favorites');
+
+  } catch (error) {
     let errorMessage = `No se pudo actualizar el proyecto con ID ${projectId}. Ocurrió un error desconocido.`;
     if (error instanceof FirebaseError) {
       errorMessage = `Error de Firebase al actualizar proyecto ID ${projectId}: ${error.message} (Código: ${error.code})`;
@@ -198,6 +233,10 @@ export async function updateProjectInFirestore(projectId: string, projectData: P
  */
 export async function deleteProjectFromFirestore(projectId: string): Promise<void> {
   console.log(`[Acción de Servidor] deleteProjectFromFirestore llamada para ID: ${projectId}`);
+  if (!firestore) {
+    console.error("[Acción de Servidor Error] deleteProjectFromFirestore:", FIRESTORE_UNINITIALIZED_ERROR);
+    throw new Error(FIRESTORE_UNINITIALIZED_ERROR);
+  }
   if (!projectId || typeof projectId !== 'string' || projectId.trim() === '') {
     const invalidIdErrorMsg = 'ID de proyecto inválido proporcionado para eliminar.';
     console.error('[Acción de Servidor Error]', invalidIdErrorMsg, 'Recibido:', projectId);
@@ -207,6 +246,12 @@ export async function deleteProjectFromFirestore(projectId: string): Promise<voi
     const projectDocRef = doc(firestore, 'projects', projectId);
     await deleteDoc(projectDocRef);
     console.log(`[Acción de Servidor] Proyecto con ID ${projectId} eliminado exitosamente de Firestore.`);
+
+    // Revalidate public paths
+    revalidatePath('/');
+    revalidatePath('/projects');
+    revalidatePath('/favorites');
+
   } catch (error) {
     let errorMessage = `No se pudo eliminar el proyecto con ID ${projectId}. Ocurrió un error desconocido.`;
     if (error instanceof FirebaseError) {

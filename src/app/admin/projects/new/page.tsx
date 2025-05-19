@@ -4,7 +4,7 @@
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { ProjectForm } from "@/components/admin/ProjectForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation'; 
 
 export default function NewProjectPage() {
   const router = useRouter(); 
@@ -13,8 +13,8 @@ export default function NewProjectPage() {
     console.log(`Proyecto creado exitosamente con ID: ${projectId} desde el nivel de página.`);
     // Redirect to the projects list page after successful creation
     router.push('/admin/projects'); 
-    // You might also want to call router.refresh() if the projects page needs to re-fetch immediately
-    // but since it fetches on mount, push should be enough if it re-mounts or re-runs useEffect.
+    // Refresh the data for the /admin/projects route
+    router.refresh(); 
   };
 
   return (
