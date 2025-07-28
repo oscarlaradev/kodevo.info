@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 67% 95.3%; /* Light Lavender */
+    --foreground: 285 25% 15%; /* Dark Purple/Grey */
+
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 285 25% 15%; /* Dark Purple/Grey */
+
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 285 25% 15%; /* Dark Purple/Grey */
+
+    --primary: 285 100% 41.6%; /* Medium Purple */
+    --primary-foreground: 285 100% 95%; /* Light Purple/White */
+
+    --secondary: 285 80% 85%; /* Lighter Purple */
+    --secondary-foreground: 285 25% 15%; /* Dark Purple/Grey for text on Lighter Purple */
+
+    --muted: 240 60% 92%; /* Muted Lavender */
+    --muted-foreground: 240 25% 45%; /* Darker Muted Lavender */
+
+    --accent: 182 100% 74.3%; /* Electric Blue */
+    --accent-foreground: 182 100% 20%; /* Dark Blue for text on Electric Blue */
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 285 50% 88%; /* Light Purple Border */
+    --input: 285 50% 90%; /* Light Purple Input BG */
+    --ring: 182 100% 74.3%; /* Electric Blue for focus rings */
+
+    --radius: 0.75rem; /* Slightly more rounded */
+
+    /* Custom variables for animations */
+    --animation-speed-fast: 0.2s;
+    --animation-speed-normal: 0.4s;
+    --animation-speed-slow: 0.6s;
+    --animation-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+    /* Scrollbar CSS Variables - default to hidden/transparent */
+    --_scrollbar-thumb-bg: hsl(var(--muted-foreground) / 0);
+    --_scrollbar-track-bg: hsl(var(--background) / 0);
+    --_scrollbar-thumb-border-color: transparent;
+  }
+
+  .dark {
+    /* Define dark mode colors if needed, for now keeping it light based on request */
+    --background: 285 25% 10%; 
+    --foreground: 240 60% 92%;
+
+    --card: 285 25% 15%;
+    --card-foreground: 240 60% 92%;
+
+    --popover: 285 25% 12%;
+    --popover-foreground: 240 60% 92%;
+
+    --primary: 285 100% 60%;
+    --primary-foreground: 285 25% 10%;
+
+    --secondary: 285 80% 40%;
+    --secondary-foreground: 240 60% 92%;
+
+    --muted: 285 20% 25%;
+    --muted-foreground: 240 30% 65%;
+
+    --accent: 182 100% 65%;
+    --accent-foreground: 182 100% 10%;
+
+    --border: 285 20% 30%;
+    --input: 285 20% 35%;
+    --ring: 182 100% 65%;
+
+    /* Dark mode scrollbar variables */
+    --_scrollbar-thumb-bg: hsl(var(--muted-foreground) / 0);
+    --_scrollbar-track-bg: hsl(var(--background) / 0);
+    --_scrollbar-thumb-border-color: transparent;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Update scrollbar variables on body hover for WebKit */
+  body:hover {
+    --_scrollbar-thumb-bg: hsl(var(--muted-foreground) / 0.5);
+    --_scrollbar-track-bg: hsl(var(--muted) / 0.15);
+    --_scrollbar-thumb-border-color: hsl(var(--muted) / 0.15); /* Match track for inset look */
+  }
+  
+  /* Dark mode specific hover for scrollbar */
+  .dark body:hover {
+    --_scrollbar-thumb-bg: hsl(var(--muted-foreground) / 0.5);
+    --_scrollbar-track-bg: hsl(var(--muted) / 0.2);
+    --_scrollbar-thumb-border-color: hsl(var(--muted) / 0.2);
+  }
+
+
+  /* Add some subtle animations for elements */
+  .animate-fade-in {
+    animation: fadeIn var(--animation-speed-normal) var(--animation-ease) forwards;
+    opacity: 0;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp var(--animation-speed-normal) var(--animation-ease) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Scrollbar Styles */
+  /* For WebKit-based browsers (Chrome, Safari, newer Edge) */
+  ::-webkit-scrollbar {
+    width: 10px; /* Slightly wider to accommodate the border nicely */
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--_scrollbar-track-bg);
+    border-radius: 10px;
+    transition: background 0.2s ease-out;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--_scrollbar-thumb-bg);
+    border-radius: 10px;
+    /* Creates an inset effect. The border width makes the thumb effectively thinner. */
+    border: 2px solid var(--_scrollbar-thumb-border-color); 
+    background-clip: padding-box; /* Ensures border is "outside" the background area */
+    transition: background 0.2s ease-out, border-color 0.2s ease-out;
+  }
+
+  /* Make thumb more prominent when directly hovering over it (if it's already visible) */
+  body:hover ::-webkit-scrollbar-thumb:hover {
+     background: hsl(var(--muted-foreground) / 0.7);
+  }
+  .dark body:hover ::-webkit-scrollbar-thumb:hover {
+     background: hsl(var(--muted-foreground) / 0.7);
+  }
+
+
+  /* For Firefox */
+  /* Firefox scrollbar styling is more limited. 
+     We'll make it thin and use subtle colors that are always somewhat visible.
+     The "hidden then appear on body hover" effect is not reliably achievable with pure CSS for Firefox.
+  */
+  html { 
+    scrollbar-width: thin; 
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) hsl(var(--background) / 0.05); /* thumb and track color - very subtle */
+  }
+  .dark html {
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) hsl(var(--background) / 0.05);
+  }
+}
+
