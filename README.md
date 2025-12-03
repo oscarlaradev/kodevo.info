@@ -28,7 +28,7 @@ Mi objetivo es crear soluciones robustas, reutilizables y con impacto real en la
 - Backend: .NET, Node.js, Firebase
 - DevOps: GitHub Actions, Vercel
 - Otros: Seguridad de sistemas, optimización de rendimiento
-
+- Ia Gemini
 ---
 
 ## ⚙️ Cómo ejecutar
