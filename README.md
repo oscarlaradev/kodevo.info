@@ -7,7 +7,6 @@ Desplegado con [Vercel](https://vercel.com) para garantizar velocidad, seguridad
 
 ## 📋 Contenido
 - [Sobre mí](#-sobre-mí)
-- [Proyectos](#-proyectos)
 - [Tecnologías](#-tecnologías)
 - [Cómo ejecutar](#-cómo-ejecutar)
 - [Contacto](#-contacto)
@@ -15,20 +14,12 @@ Desplegado con [Vercel](https://vercel.com) para garantizar velocidad, seguridad
 ---
 
 ## 👨‍💻 Sobre mí
-Soy **Full-stack builder** con experiencia en:
+Soy **Full-stack builder junior** con experiencia en:
 - .NET MAUI, Windows Forms, Android Studio
-- Firebase/Firestore y despliegue en la nube (Vercel, Astro)
-- Git/GitHub avanzado y seguridad de sistemas
+- Firebase/Firestore/Firebase Studio y despliegue en la nube (Vercel, Astro, etc)
 - Diseño de presentaciones educativas y contenido accesible
 
 Mi objetivo es crear soluciones robustas, reutilizables y con impacto real en la experiencia del usuario.
-
----
-
-## 🚀 Proyectos
-- **Stratus** → Plataforma enfocada en experiencia de cliente y branding digital.
-- **Los Lara** → Proyecto creativo de marca con enfoque en conexión emocional.
-- **Módulos Académicos** → Automatización de tareas educativas con Firebase.
 
 ---
 
