@@ -34,5 +34,5 @@ Mi objetivo es crear soluciones robustas, reutilizables y con impacto real en la
 ## ⚙️ Cómo ejecutar
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/usuario/portafolio.git
+   git clone https://github.com/oscarlaradev/kodevo.info.git
 
