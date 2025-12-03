@@ -1,7 +1,7 @@
 # 🌐 Portafolio Personal – Oscar Lara
 
 Bienvenido a mi portafolio web, un espacio donde muestro mis proyectos, habilidades y experiencia profesional.  
-Desplegado con [Vercel](https://vercel.com) para garantizar velocidad, seguridad y escalabilidad.
+Desplegado con [Vercel](https://vercel.com/oscarinlara87-gmailcoms-projects) para garantizar velocidad, seguridad y escalabilidad.
 
 ---
 
